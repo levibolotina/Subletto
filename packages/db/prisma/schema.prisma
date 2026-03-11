@@ -1,0 +1,451 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── USERS ──────────────────────────────────────────────────────────────────
+model User {
+  id          String    @id @default(cuid())
+  clerkId     String    @unique
+  email       String    @unique
+  role        Role      @default(SEEKER)
+  verifiedAt  DateTime?
+  trustScore  Float     @default(0)
+  suspendedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  profile          Profile?
+  listings         Listing[]
+  leases           Lease[]        @relation("TenantLeases")
+  verification     Verification?
+  savedSearches    SavedSearch[]
+  listerMatches    Match[]        @relation("ListerMatches")
+  subtenantMatches Match[]        @relation("SubtenantMatches")
+  documents        Document[]
+  reviewsGiven     Review[]       @relation("ReviewsGiven")
+  reviewsReceived  Review[]       @relation("ReviewsReceived")
+  reportsMade      Report[]       @relation("ReportsMade")
+  reportsAgainst   Report[]       @relation("ReportsAgainst")
+
+  @@map("users")
+}
+
+model Profile {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  displayName String
+  avatarUrl   String?
+  bio         String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+// ─── VERIFICATION ────────────────────────────────────────────────────────────
+model Verification {
+  id                  String              @id @default(cuid())
+  userId              String              @unique
+  idDocUrl            String              // Supabase Storage path (encrypted at rest)
+  leaseDocUrl         String              // Supabase Storage path
+  subleasePermitted   Boolean?            // legacy boolean — prefer leasePermission below
+  listerLeaseAnswer   ListerLeaseAnswer?  // self-reported by lister during onboarding
+  leasePermission     LeasePermission?    // admin-set authoritative classification
+  adminNotes          String?
+  status              VerificationStatus  @default(PENDING)
+  submittedAt         DateTime            @default(now())
+  reviewedAt          DateTime?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("verifications")
+}
+
+// ─── LISTINGS ───────────────────────────────────────────────────────────────
+model Listing {
+  id            String        @id @default(cuid())
+  ownerId       String
+  status        ListingStatus @default(DRAFT)
+  title         String
+  slug          String        @unique
+  description   String?
+  neighborhood  String
+  address       String        // never exposed publicly
+  city          String        @default("Boulder")
+  state         String        @default("CO")
+  zipCode       String
+  bedrooms      Int
+  bathrooms     Float
+  furnished     Boolean       @default(false)
+  petFriendly   Boolean       @default(false)
+  parking       Boolean       @default(false)
+  rentCents     Int           // stored in cents
+  availableFrom DateTime
+  availableTo   DateTime
+  // 7-day confirmation fields
+  confirmedAt           DateTime? // when lister last confirmed listing is available
+  confirmationToken     String?   @unique
+  confirmationSentAt    DateTime? // when the confirmation email was sent
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  isFlagged Boolean       @default(false)
+
+  owner     User           @relation(fields: [ownerId], references: [id])
+  photos    ListingPhoto[]
+  leases    Lease[]
+  matches   Match[]
+  documents Document[]
+  scamFlags ScamFlag[]
+  reports   Report[]
+
+  @@map("listings")
+}
+
+// ─── SAVED SEARCHES ─────────────────────────────────────────────────────────
+model SavedSearch {
+  id           String    @id @default(cuid())
+  seekerId     String
+  neighborhood String?
+  minRentCents Int?
+  maxRentCents Int?
+  availableFrom DateTime?
+  availableTo   DateTime?
+  bedrooms     Int?
+  petFriendly  Boolean?
+  furnished    Boolean?
+  lastNotifiedAt DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  seeker User @relation(fields: [seekerId], references: [id], onDelete: Cascade)
+
+  @@map("saved_searches")
+}
+
+model ListingPhoto {
+  id         String  @id @default(cuid())
+  listingId  String
+  storageKey String  // Supabase Storage object key
+  order      Int     @default(0)
+  isPrimary  Boolean @default(false)
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@map("listing_photos")
+}
+
+// ─── MATCHES ────────────────────────────────────────────────────────────────
+
+model Match {
+  id                    String       @id @default(cuid())
+  listingId             String
+  listerId              String
+  subtenantId           String
+  status                MatchStatus  @default(PENDING_PAYMENT)
+  checkoutSessionId     String?      @unique
+  feePaidAt             DateTime?
+  revealedAt            DateTime?
+  escrowStatus          EscrowStatus @default(NONE)
+  escrowPaymentIntentId String?      @unique
+  escrowAmountCents     Int?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+
+  ratingRequestSentAt DateTime?
+
+  listing   Listing    @relation(fields: [listingId], references: [id])
+  lister    User       @relation("ListerMatches", fields: [listerId], references: [id])
+  subtenant User       @relation("SubtenantMatches", fields: [subtenantId], references: [id])
+  payments  Payment[]
+  documents Document[]
+  reviews   Review[]
+
+  @@map("matches")
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  matchId     String
+  amountCents Int
+  type        PaymentType
+  stripeId    String        @unique
+  status      PaymentStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+// ─── DOCUMENTS ──────────────────────────────────────────────────────────────
+
+model Document {
+  id                   String         @id @default(cuid())
+  type                 DocumentType
+  status               DocumentStatus @default(PENDING)
+  ownerId              String         // user who requested the document
+  matchId              String?        // present for SUBLEASE_AGREEMENT
+  listingId            String?        // present for LANDLORD_PACKET
+  storagePath          String?        // Supabase Storage key for the generated PDF
+  signedStoragePath    String?        // Supabase Storage key for the signed copy
+  docusignEnvelopeId   String?        @unique
+  docusignStatus       String?        // DocuSign envelope status string
+  addOnPaidAt          DateTime?      // populated when $35 landlord-packet fee is paid
+  signedAt             DateTime?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  owner   User     @relation(fields: [ownerId], references: [id])
+  match   Match?   @relation(fields: [matchId], references: [id])
+  listing Listing? @relation(fields: [listingId], references: [id])
+
+  @@map("documents")
+}
+
+// ─── LEASES ─────────────────────────────────────────────────────────────────
+model Lease {
+  id              String      @id @default(cuid())
+  listingId       String
+  tenantId        String
+  status          LeaseStatus @default(PENDING)
+  startDate       DateTime
+  endDate         DateTime
+  rentCents       Int
+  feeCents        Int         // platform fee (5% of first month)
+  stripePaymentId String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  listing Listing @relation(fields: [listingId], references: [id])
+  tenant  User    @relation("TenantLeases", fields: [tenantId], references: [id])
+
+  @@map("leases")
+}
+
+// ─── ENUMS ──────────────────────────────────────────────────────────────────
+enum Role {
+  LISTER  // has a lease, wants to sublet
+  SEEKER  // looking for a sublease
+  ADMIN
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum ListingStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  MATCHED
+  EXPIRED
+  LEASED
+  ARCHIVED
+}
+
+enum LeaseStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  DISPUTED
+  CANCELLED
+}
+
+enum MatchStatus {
+  PENDING_PAYMENT   // seeker initiated, awaiting Stripe checkout
+  AWAITING_LISTER   // fee paid, lister must accept or decline
+  CONFIRMED         // lister accepted, both parties revealed, no refund
+  DECLINED          // lister declined, full refund issued
+  CANCELLED         // seeker cancelled before payment
+}
+
+enum EscrowStatus {
+  NONE
+  PENDING_PAYMENT
+  HELD
+  RELEASED
+  REFUNDED
+}
+
+enum PaymentType {
+  CONNECTION_FEE
+  ESCROW_RENT
+  ESCROW_DEPOSIT
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  REFUNDED
+  FAILED
+}
+
+enum ListerLeaseAnswer {
+  YES      // lister says lease permits subletting
+  NO       // lister says lease prohibits subletting
+  UNKNOWN  // lister is unsure
+}
+
+enum LeasePermission {
+  PERMITTED
+  PROHIBITED
+  REQUIRES_LANDLORD_APPROVAL
+}
+
+enum DocumentType {
+  SUBLEASE_AGREEMENT
+  LANDLORD_PACKET
+}
+
+enum DocumentStatus {
+  PENDING            // created, not yet generated
+  GENERATED          // PDF built and stored in Supabase
+  SENT_FOR_SIGNATURE // DocuSign envelope sent
+  SIGNED             // all parties signed
+  DECLINED_SIGNING   // a party declined
+}
+
+// ─── REVIEWS ─────────────────────────────────────────────────────────────────
+
+model Review {
+  id          String     @id @default(cuid())
+  matchId     String
+  reviewerId  String
+  revieweeId  String
+  role        ReviewRole
+
+  // Lister reviews subtenant (reliability, communication, paymentSpeed)
+  reliability    Int?   // 1-5
+  communication  Int?   // 1-5
+  paymentSpeed   Int?   // 1-5
+
+  // Subtenant reviews lister (listingAccuracy, responsiveness, unitCondition)
+  listingAccuracy Int?  // 1-5
+  responsiveness  Int?  // 1-5
+  unitCondition   Int?  // 1-5
+
+  comment      String?
+  overallScore Float   // stored computed average
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  match    Match @relation(fields: [matchId], references: [id])
+  reviewer User  @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+  reviewee User  @relation("ReviewsReceived", fields: [revieweeId], references: [id])
+
+  @@unique([matchId, reviewerId])
+  @@map("reviews")
+}
+
+// ─── REPORTS ─────────────────────────────────────────────────────────────────
+
+model Report {
+  id             String         @id @default(cuid())
+  reporterId     String
+  reportedUserId String?
+  listingId      String?
+  category       ReportCategory
+  description    String?
+  status         ReportStatus   @default(PENDING)
+  adminNotes     String?
+  resolvedAt     DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  reporter     User     @relation("ReportsMade", fields: [reporterId], references: [id])
+  reportedUser User?    @relation("ReportsAgainst", fields: [reportedUserId], references: [id])
+  listing      Listing? @relation(fields: [listingId], references: [id])
+
+  @@map("reports")
+}
+
+// ─── SCAM FLAGS ───────────────────────────────────────────────────────────────
+
+model ScamFlag {
+  id        String        @id @default(cuid())
+  listingId String
+  reason    ScamFlagReason
+  details   String?
+  createdAt DateTime      @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@map("scam_flags")
+}
+
+// ─── NEW ENUMS ───────────────────────────────────────────────────────────────
+
+enum ReviewRole {
+  LISTER_REVIEWS_SUBTENANT
+  SUBTENANT_REVIEWS_LISTER
+}
+
+enum ReportCategory {
+  SCAM
+  WRONG_INFO
+  INAPPROPRIATE
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  DISMISSED
+}
+
+enum ScamFlagReason {
+  PRICE_TOO_LOW       // >20% below neighborhood median
+  NEW_ACCOUNT_URGENT  // account <24h old + urgent keywords
+  REPORTED_SCAM       // aggregated from user reports
+}
+
+// ─── GROWTH / WAITLIST ────────────────────────────────────────────────────────
+
+model WaitlistEntry {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  referralCode String    @unique  // 6-char code the user can share
+  referredBy   String?             // referralCode of the referrer
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("waitlist_entries")
+}
+
+// Anonymised record created automatically when a Match is CONFIRMED
+model SuccessStory {
+  id           String   @id @default(cuid())
+  neighborhood String
+  bedrooms     Int
+  bathrooms    Float
+  fromDate     DateTime
+  toDate       DateTime
+  rentCents    Int
+  createdAt    DateTime @default(now())
+
+  @@map("success_stories")
+}
+
+// User-submitted marketing quote, approved by admin before showing on landing page
+model Testimonial {
+  id          String   @id @default(cuid())
+  quote       String
+  displayName String?  // left null for anonymous display
+  isApproved  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("testimonials")
+}

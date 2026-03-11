@@ -264,7 +264,7 @@ export async function searchListings(filters: SearchFiltersInput) {
       where,
       include: {
         photos: { where: { isPrimary: true }, take: 1 },
-        owner: { select: { verifiedAt: true } },
+        owner: { select: { verifiedAt: true, trustScore: true, reviewsReceived: { select: { id: true } } } },
       },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * pageSize,

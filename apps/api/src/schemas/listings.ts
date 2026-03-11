@@ -2,7 +2,7 @@ import { z } from "zod";
 import { BOULDER_NEIGHBORHOODS } from "@subletto/shared";
 
 const NeighborhoodEnum = z.enum(
-  BOULDER_NEIGHBORHOODS as [string, ...string[]],
+  [...BOULDER_NEIGHBORHOODS] as [string, ...string[]],
 );
 
 export const CreateListingSchema = z.object({

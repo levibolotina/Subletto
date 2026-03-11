@@ -15,7 +15,7 @@ import { adminRoutes } from "./routes/v1/admin.js";
 const app = Fastify({ logger: true });
 
 app.register(cors, {
-  origin: process.env.NEXT_PUBLIC_APP_URL,
+  origin: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   credentials: true,
 });
 app.register(helmet);

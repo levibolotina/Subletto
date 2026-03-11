@@ -1,6 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "strict": false,
+    "exactOptionalPropertyTypes": false,
+    "esModuleInterop": true,
     "module": "CommonJS",
     "moduleResolution": "node",
     "outDir": "dist",

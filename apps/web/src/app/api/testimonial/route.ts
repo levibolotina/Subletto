@@ -4,7 +4,7 @@ import { prisma } from "@subletto/db";
 // POST /api/testimonial — public submission
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const body = await req.json() as any;
     const quote: string = (body.quote ?? "").trim();
     const displayName: string = (body.displayName ?? "").trim();
 

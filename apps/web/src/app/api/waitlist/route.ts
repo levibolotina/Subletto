@@ -29,7 +29,7 @@ async function computePosition(entryId: string): Promise<number> {
 // POST /api/waitlist — join the waitlist
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const body = await req.json() as any;
     const email: string = (body.email ?? "").trim().toLowerCase();
     const refCode: string = (body.referredBy ?? "").trim().toUpperCase();
 

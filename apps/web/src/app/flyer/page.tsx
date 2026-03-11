@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PrintButton } from "./print-button";
 
 export const metadata: Metadata = {
   title: "Subletto — Campus Flyer",
@@ -29,17 +30,7 @@ export default function FlyerPage() {
       `}</style>
 
       {/* Print button */}
-      <div className="no-print flex justify-center gap-4 bg-slate-100 py-4">
-        <button
-          onClick={() => window.print()}
-          className="rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold text-white hover:bg-indigo-700"
-        >
-          Print / Save as PDF
-        </button>
-        <p className="self-center text-sm text-slate-500">
-          Tip: Set margins to "None" in your browser's print dialog for best results.
-        </p>
-      </div>
+      <PrintButton />
 
       {/* Flyer — 8.5×11 */}
       <div

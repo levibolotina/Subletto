@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npx turbo run build --filter=@subletto/web...",
-  "outputDirectory": "apps/web/.next",
-  "installCommand": "npm install",
+  "buildCommand": "cd ../.. && npx turbo run build --filter=@subletto/web...",
+  "outputDirectory": ".next",
+  "installCommand": "cd ../.. && npm install",
   "framework": "nextjs"
 }

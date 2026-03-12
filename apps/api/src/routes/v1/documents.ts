@@ -106,9 +106,16 @@ export async function documentRoutes(fastify: FastifyInstance) {
   );
 
   // ── POST /v1/webhooks/docusign ──────────────────────────────────────────
-  // DocuSign Connect webhook — called by DocuSign when envelope status changes.
-  // Registered as a public route (no auth header from DocuSign).
+  // DocuSign Connect webhook — proxied from the Next.js route handler.
+  // Verified by API_SECRET header set by the Next.js proxy.
   fastify.post("/webhooks/docusign", async (request, reply) => {
+    const apiSecret = process.env.API_SECRET;
+    const incomingSecret = request.headers["x-api-secret"] as string | undefined;
+    if (!apiSecret || !incomingSecret || incomingSecret !== apiSecret) {
+      fastify.log.warn("DocuSign webhook rejected — invalid x-api-secret");
+      return reply.code(403).send({ error: "Forbidden" });
+    }
+
     try {
       // DocuSign Connect sends JSON with event data
       const body = request.body as {

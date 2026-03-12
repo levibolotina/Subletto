@@ -17,8 +17,9 @@ const API_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
  * Secured by CRON_SECRET header.
  */
 export async function GET(request: Request) {
+  const cronSecret = process.env.CRON_SECRET;
   const secret = request.headers.get("x-cron-secret");
-  if (secret !== process.env.CRON_SECRET) {
+  if (!cronSecret || !secret || secret !== cronSecret) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

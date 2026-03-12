@@ -17,7 +17,7 @@ export async function authRoutes(fastify: FastifyInstance) {
   // POST /v1/auth/verify — lister submits ID + lease docs
   fastify.post(
     "/auth/verify",
-    { preHandler: [fastify.authenticate] },
+    { config: { rateLimit: { max: 5, timeWindow: "1 hour" } }, preHandler: [fastify.authenticate] },
     async (request, reply) => {
       const user = request.dbUser!;
       const result = SubmitVerificationSchema.safeParse(request.body);
@@ -74,7 +74,7 @@ export async function authRoutes(fastify: FastifyInstance) {
   // PATCH /v1/auth/role — set role during onboarding (one-time, LISTER or SEEKER only)
   fastify.patch(
     "/auth/role",
-    { preHandler: [fastify.authenticate] },
+    { config: { rateLimit: { max: 10, timeWindow: "1 hour" } }, preHandler: [fastify.authenticate] },
     async (request, reply) => {
       const user = request.dbUser!;
       // Prevent role escalation — only allow setting LISTER/SEEKER

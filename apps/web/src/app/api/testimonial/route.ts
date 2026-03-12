@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@subletto/db";
+import { testimonialLimiter, getIp } from "@/lib/ratelimit";
 
 // POST /api/testimonial — public submission
 export async function POST(req: NextRequest) {
+  const ip = getIp(req.headers.get("x-forwarded-for"));
+  const { success } = await testimonialLimiter.limit(ip);
+  if (!success) {
+    return NextResponse.json({ error: "Too many requests." }, { status: 429 });
+  }
+
   try {
     const body = await req.json() as any;
     const quote: string = (body.quote ?? "").trim();

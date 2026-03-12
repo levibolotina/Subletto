@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { Webhook } from "svix";
 import { prisma } from "@subletto/db";
 import { isEduEmail } from "@subletto/shared";
+import { clerkWebhookLimiter, getIp } from "@/lib/ratelimit";
 
 interface ClerkEmailAddress {
   email_address: string;
@@ -25,6 +26,13 @@ export async function POST(req: Request) {
   }
 
   const headerPayload = await headers();
+
+  const ip = getIp(headerPayload.get("x-forwarded-for"));
+  const { success } = await clerkWebhookLimiter.limit(ip);
+  if (!success) {
+    return NextResponse.json({ error: "Too many requests." }, { status: 429 });
+  }
+
   const svixId = headerPayload.get("svix-id");
   const svixTimestamp = headerPayload.get("svix-timestamp");
   const svixSignature = headerPayload.get("svix-signature");

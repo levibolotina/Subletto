@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@subletto/db";
+import { waitlistLimiter, getIp } from "@/lib/ratelimit";
 
 function generateCode(): string {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -28,6 +29,12 @@ async function computePosition(entryId: string): Promise<number> {
 
 // POST /api/waitlist — join the waitlist
 export async function POST(req: NextRequest) {
+  const ip = getIp(req.headers.get("x-forwarded-for"));
+  const { success } = await waitlistLimiter.limit(ip);
+  if (!success) {
+    return NextResponse.json({ error: "Too many requests." }, { status: 429 });
+  }
+
   try {
     const body = await req.json() as any;
     const email: string = (body.email ?? "").trim().toLowerCase();
@@ -79,6 +86,12 @@ export async function POST(req: NextRequest) {
 
 // GET /api/waitlist?code=ABC123 — look up position by referral code
 export async function GET(req: NextRequest) {
+  const ip = getIp(req.headers.get("x-forwarded-for"));
+  const { success } = await waitlistLimiter.limit(ip);
+  if (!success) {
+    return NextResponse.json({ error: "Too many requests." }, { status: 429 });
+  }
+
   const code = req.nextUrl.searchParams.get("code")?.toUpperCase();
   if (!code) {
     return NextResponse.json({ error: "Missing code." }, { status: 400 });

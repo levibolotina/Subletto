@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { stripeWebhookLimiter, getIp } from "@/lib/ratelimit";
 
 /**
  * POST /api/webhooks/stripe
@@ -13,6 +14,13 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   const rawBody = await req.text();
   const headerPayload = await headers();
+
+  const ip = getIp(headerPayload.get("x-forwarded-for"));
+  const { success } = await stripeWebhookLimiter.limit(ip);
+  if (!success) {
+    return NextResponse.json({ error: "Too many requests." }, { status: 429 });
+  }
+
   const sig = headerPayload.get("stripe-signature");
 
   if (!sig) {

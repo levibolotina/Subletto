@@ -5,18 +5,26 @@ import { prisma } from "@subletto/db";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [waitlistCount, approvedTestimonials, successStories] = await Promise.all([
-    prisma.waitlistEntry.count(),
-    prisma.testimonial.findMany({
-      where: { isApproved: true },
-      orderBy: { createdAt: "desc" },
-      take: 3,
-    }),
-    prisma.successStory.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 3,
-    }),
-  ]);
+  let waitlistCount = 0;
+  let approvedTestimonials: Awaited<ReturnType<typeof prisma.testimonial.findMany>> = [];
+  let successStories: Awaited<ReturnType<typeof prisma.successStory.findMany>> = [];
+
+  try {
+    [waitlistCount, approvedTestimonials, successStories] = await Promise.all([
+      prisma.waitlistEntry.count(),
+      prisma.testimonial.findMany({
+        where: { isApproved: true },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+      }),
+      prisma.successStory.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 3,
+      }),
+    ]);
+  } catch (err) {
+    console.error("[HomePage] DB fetch failed:", err);
+  }
   return (
     <main>
       {/* ── Hero ─────────────────────────────────────────────────────── */}

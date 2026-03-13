@@ -3,7 +3,6 @@ import Link from "next/link";
 import { currentUser } from "@/lib/clerk";
 import { prisma } from "@subletto/db";
 import { formatCurrency } from "@subletto/shared";
-import VerificationBadge from "@/components/features/verification-badge";
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING_PAYMENT: "Payment pending",
@@ -45,6 +44,7 @@ export default async function DashboardPage() {
 
   const isLister = user.role === "LISTER";
   const isSeeker = user.role === "SEEKER";
+  const hasRole = isLister || isSeeker || user.role === "ADMIN";
 
   // Fetch role-specific data
   const [listings, matches] = await Promise.all([
@@ -68,98 +68,183 @@ export default async function DashboardPage() {
   ]);
 
   const isVerified = !!user.verifiedAt;
-  const needsVerification = isLister && !user.verification;
+  const verificationStatus = user.verification?.status ?? null;
   const firstName =
     clerkUser.firstName ?? user.email.split("@")[0] ?? "there";
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
-      {/* Header */}
+      {/* ── Header ────────────────────────────────────────────────────── */}
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-indigo-600">
-            {isLister ? "Lister" : isSeeker ? "Subtenant" : "Dashboard"}
-          </p>
-          <h1 className="mt-0.5 text-3xl font-extrabold text-slate-900">
+          {/* Role label — click to switch role via onboarding */}
+          <Link
+            href="/onboarding"
+            className="inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100"
+          >
+            {isLister ? "🏠 Lister" : isSeeker ? "🔍 Subtenant" : "No role set"}
+            <span className="text-indigo-400">· switch</span>
+          </Link>
+          <h1 className="mt-2 text-3xl font-extrabold text-slate-900">
             Hey, {firstName} 👋
           </h1>
           <p className="mt-1 text-sm text-slate-400">{user.email}</p>
         </div>
-        <VerificationBadge
-          status={user.verification?.status ?? null}
-          role={user.role}
-        />
+
+        {/* Verification status badge — links to verify page */}
+        {isLister && (
+          <Link
+            href="/dashboard/verify"
+            className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+              isVerified
+                ? "bg-green-100 text-green-700 hover:bg-green-200"
+                : verificationStatus === "PENDING"
+                  ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                  : verificationStatus === "REJECTED"
+                    ? "bg-red-100 text-red-700 hover:bg-red-200"
+                    : "bg-amber-100 text-amber-700 hover:bg-amber-200"
+            }`}
+          >
+            {isVerified
+              ? "✓ Verified"
+              : verificationStatus === "PENDING"
+                ? "⏳ In review"
+                : verificationStatus === "REJECTED"
+                  ? "✗ Rejected"
+                  : "⚠ Not verified"}
+          </Link>
+        )}
       </div>
 
-      {/* ── Verification banners ──────────────────────────────────────── */}
-      {needsVerification && (
-        <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+      {/* ── Step-by-step onboarding banners (shown in priority order) ── */}
+
+      {/* 1. No role — onboarding not complete */}
+      {!hasRole && (
+        <div className="mb-6 rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
           <div className="flex items-start gap-3">
-            <span className="text-2xl">⚠️</span>
+            <span className="text-2xl">👋</span>
             <div className="flex-1">
-              <h2 className="font-semibold text-amber-900">
-                Verification required to list
+              <h2 className="font-semibold text-indigo-900">
+                Complete your setup
               </h2>
-              <p className="mt-1 text-sm text-amber-700">
-                Upload your government ID and lease document to get verified.
-                Usually approved within 24 hours.
+              <p className="mt-1 text-sm text-indigo-700">
+                Tell us how you&apos;re using Subletto so we can set up the
+                right experience for you.
               </p>
               <Link
-                href="/dashboard/verify"
-                className="mt-3 inline-block rounded-xl bg-amber-600 px-5 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+                href="/onboarding"
+                className="mt-3 inline-block rounded-xl bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
               >
-                Start verification →
+                Complete setup →
               </Link>
             </div>
           </div>
         </div>
       )}
 
-      {user.role === "LISTER" && user.verification?.status === "REJECTED" && (
-        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-5">
-          <h2 className="font-semibold text-red-900">Verification rejected</h2>
-          {user.verification.adminNotes && (
-            <p className="mt-1 text-sm text-red-700">
-              {user.verification.adminNotes}
-            </p>
-          )}
-          <Link
-            href="/dashboard/verify"
-            className="mt-3 inline-block rounded-xl bg-red-600 px-5 py-2 text-sm font-semibold text-white hover:bg-red-700"
-          >
-            Resubmit documents →
-          </Link>
-        </div>
-      )}
-
-      {user.role === "LISTER" && user.verification?.status === "PENDING" && (
-        <div className="mb-6 rounded-2xl border border-blue-200 bg-blue-50 p-5">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">⏳</span>
-            <div>
-              <h2 className="font-semibold text-blue-900">
-                Verification in review
+      {/* 2. Lister — no verification started */}
+      {isLister && !user.verification && (
+        <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">🪪</span>
+            <div className="flex-1">
+              <h2 className="font-semibold text-amber-900">
+                Verify your identity to start listing
               </h2>
-              <p className="mt-0.5 text-sm text-blue-700">
-                Our team is reviewing your documents — usually within 24 hours.
+              <p className="mt-1 text-sm text-amber-700">
+                Upload your government ID and lease document. Usually approved
+                within 24 hours.
               </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link
+                  href="/dashboard/verify"
+                  className="inline-block rounded-xl bg-amber-600 px-5 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+                >
+                  Verify identity →
+                </Link>
+                <Link
+                  href="/onboarding"
+                  className="inline-block rounded-xl border border-amber-300 bg-white px-5 py-2 text-sm font-semibold text-amber-700 hover:bg-amber-50"
+                >
+                  Switch to Seeker
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {isVerified && (
-        <div className="mb-6 rounded-2xl border border-green-200 bg-green-50 p-5">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">✅</span>
-            <div>
-              <h2 className="font-semibold text-green-900">
-                You&apos;re verified!
+      {/* 3. Lister — verification rejected */}
+      {isLister && verificationStatus === "REJECTED" && (
+        <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-5">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">❌</span>
+            <div className="flex-1">
+              <h2 className="font-semibold text-red-900">
+                Verification rejected
               </h2>
-              <p className="mt-0.5 text-sm text-green-700">
-                Your listings are eligible to go live on Subletto.
-              </p>
+              {user.verification?.adminNotes && (
+                <p className="mt-1 text-sm text-red-700">
+                  {user.verification.adminNotes}
+                </p>
+              )}
+              <Link
+                href="/dashboard/verify"
+                className="mt-3 inline-block rounded-xl bg-red-600 px-5 py-2 text-sm font-semibold text-white hover:bg-red-700"
+              >
+                Resubmit documents →
+              </Link>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. Lister — verification pending */}
+      {isLister && verificationStatus === "PENDING" && (
+        <div className="mb-6 rounded-2xl border border-blue-200 bg-blue-50 p-5">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">⏳</span>
+            <div className="flex-1">
+              <h2 className="font-semibold text-blue-900">
+                Verification in review
+              </h2>
+              <p className="mt-0.5 text-sm text-blue-700">
+                Our team is reviewing your documents — usually within 24 hours.
+                We&apos;ll email you when it&apos;s done.
+              </p>
+              <Link
+                href="/dashboard/verify"
+                className="mt-3 inline-block rounded-xl border border-blue-300 bg-white px-5 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-50"
+              >
+                View your submission →
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5. Lister — verified: prompt to create a listing */}
+      {isVerified && listings.length === 0 && (
+        <div className="mb-6 rounded-2xl border border-green-200 bg-green-50 p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">✅</span>
+              <div>
+                <h2 className="font-semibold text-green-900">
+                  You&apos;re verified — ready to list!
+                </h2>
+                <p className="mt-0.5 text-sm text-green-700">
+                  Your account is approved. Create your first listing to start
+                  getting matched.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/dashboard/listings/new"
+              className="shrink-0 rounded-xl bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800"
+            >
+              Create listing →
+            </Link>
           </div>
         </div>
       )}
@@ -181,6 +266,36 @@ export default async function DashboardPage() {
           </Link>
         )}
 
+        {isLister && isVerified && (
+          <Link
+            href="/dashboard/listings/new"
+            className="flex items-center gap-3 rounded-2xl border border-indigo-200 bg-indigo-50 p-4 shadow-sm transition hover:border-indigo-400 hover:shadow-md"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 text-xl">
+              ✏️
+            </div>
+            <div>
+              <p className="font-semibold text-indigo-900">Create listing</p>
+              <p className="text-xs text-indigo-500">Post a sublease</p>
+            </div>
+          </Link>
+        )}
+
+        {isLister && !isVerified && (
+          <Link
+            href="/dashboard/verify"
+            className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm transition hover:border-amber-400 hover:shadow-md"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 text-xl">
+              🪪
+            </div>
+            <div>
+              <p className="font-semibold text-amber-900">Verify identity</p>
+              <p className="text-xs text-amber-600">Required to list</p>
+            </div>
+          </Link>
+        )}
+
         <Link
           href="/dashboard/matches"
           className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-indigo-200 hover:shadow-md"
@@ -194,18 +309,20 @@ export default async function DashboardPage() {
           </div>
         </Link>
 
-        <Link
-          href="/listings"
-          className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-indigo-200 hover:shadow-md"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-xl">
-            🔍
-          </div>
-          <div>
-            <p className="font-semibold text-slate-900">Browse</p>
-            <p className="text-xs text-slate-400">Find subleases</p>
-          </div>
-        </Link>
+        {isSeeker && (
+          <Link
+            href="/listings"
+            className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-indigo-200 hover:shadow-md"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-xl">
+              🔍
+            </div>
+            <div>
+              <p className="font-semibold text-slate-900">Browse</p>
+              <p className="text-xs text-slate-400">Find subleases</p>
+            </div>
+          </Link>
+        )}
       </div>
 
       {/* ── LISTER: Active listings ───────────────────────────────────── */}
@@ -225,7 +342,7 @@ export default async function DashboardPage() {
                   href="/dashboard/listings/new"
                   className="rounded-xl bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700"
                 >
-                  + New
+                  + New listing
                 </Link>
               )}
             </div>
@@ -243,9 +360,17 @@ export default async function DashboardPage() {
                   Create your first listing →
                 </Link>
               ) : (
-                <p className="mt-2 text-sm text-slate-400">
-                  Complete verification first
-                </p>
+                <div className="mt-3">
+                  <p className="text-sm text-slate-400">
+                    You need to verify your identity before listing.
+                  </p>
+                  <Link
+                    href="/dashboard/verify"
+                    className="mt-3 inline-block rounded-xl bg-amber-600 px-5 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+                  >
+                    Verify identity →
+                  </Link>
+                </div>
               )}
             </div>
           ) : (
@@ -310,7 +435,7 @@ export default async function DashboardPage() {
       )}
 
       {/* ── Matches / Activity ────────────────────────────────────────── */}
-      <section>
+      <section className="mb-8">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-900">
             {isLister ? "Match requests" : "My matches"}
@@ -335,6 +460,14 @@ export default async function DashboardPage() {
                 Browse listings →
               </Link>
             )}
+            {isLister && isVerified && (
+              <Link
+                href="/dashboard/listings/new"
+                className="mt-4 inline-block rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
+              >
+                Create a listing to get matched →
+              </Link>
+            )}
           </div>
         ) : (
           <div className="space-y-2">
@@ -349,7 +482,9 @@ export default async function DashboardPage() {
                     {m.listing.title}
                   </p>
                   <p className="mt-0.5 text-xs text-slate-400">
-                    {m.listerId === user.id ? "You are the lister" : "You are the seeker"}{" "}
+                    {m.listerId === user.id
+                      ? "You are the lister"
+                      : "You are the seeker"}{" "}
                     ·{" "}
                     {new Date(m.createdAt).toLocaleDateString("en-US", {
                       month: "short",
@@ -367,6 +502,28 @@ export default async function DashboardPage() {
           </div>
         )}
       </section>
+
+      {/* ── Seeker: want to list? ─────────────────────────────────────── */}
+      {isSeeker && (
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="font-semibold text-slate-900">
+                Have a sublease to offer?
+              </p>
+              <p className="mt-0.5 text-sm text-slate-500">
+                Switch to a Lister account to post your unit.
+              </p>
+            </div>
+            <Link
+              href="/onboarding"
+              className="shrink-0 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+            >
+              Switch to Lister →
+            </Link>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

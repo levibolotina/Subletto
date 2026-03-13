@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
@@ -10,6 +11,7 @@ interface MatchRequestButtonProps {
 }
 
 export default function MatchRequestButton({ listingId, listingTitle }: MatchRequestButtonProps) {
+  const { getToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,9 +20,10 @@ export default function MatchRequestButton({ listingId, listingTitle }: MatchReq
     setLoading(true);
 
     try {
+      const token = await getToken();
       const res = await fetch(`${API_URL}/v1/matches/${listingId}/checkout`, {
         method: "POST",
-        credentials: "include",
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (res.status === 401) {

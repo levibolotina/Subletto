@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 type Document = {
   id: string;
@@ -28,6 +29,7 @@ function statusLabel(status: string) {
 
 export default function MatchDocumentsPage() {
   const { matchId } = useParams<{ matchId: string }>();
+  const { getToken } = useAuth();
   const [docs, setDocs] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,9 +40,10 @@ export default function MatchDocumentsPage() {
     setLoading(true);
     setError(null);
     try {
+      const token = await getToken();
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/v1/documents/${matchId}`,
-        { credentials: "include" },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       if (!res.ok) throw new Error("Failed to load documents");
       const data = await res.json();
@@ -60,12 +63,12 @@ export default function MatchDocumentsPage() {
     setGenerating(true);
     setError(null);
     try {
+      const token = await getToken();
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/v1/documents/generate`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({ matchId }),
         },
       );
@@ -85,12 +88,12 @@ export default function MatchDocumentsPage() {
     setSending(documentId);
     setError(null);
     try {
+      const token = await getToken();
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/v1/documents/send-docusign`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({ documentId }),
         },
       );

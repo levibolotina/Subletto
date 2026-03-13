@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import { BOULDER_NEIGHBORHOODS } from "@subletto/shared";
 import Button from "@/components/ui/button";
 import PhotoUpload from "./photo-upload";
@@ -35,6 +36,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 export default function ListingForm({ listingId, defaultValues = {} }: ListingFormProps) {
   const router = useRouter();
+  const { getToken } = useAuth();
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,13 +67,13 @@ export default function ListingForm({ listingId, defaultValues = {} }: ListingFo
     };
 
     try {
+      const token = await getToken();
       // Create or update the listing
       const res = await fetch(
         isEdit ? `${API_URL}/v1/listings/${listingId}` : `${API_URL}/v1/listings`,
         {
           method: isEdit ? "PATCH" : "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify(body),
         },
       );
@@ -89,8 +91,7 @@ export default function ListingForm({ listingId, defaultValues = {} }: ListingFo
         const photo = photos[i]!;
         await fetch(`${API_URL}/v1/listings/${targetId}/photos`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({
             storageKey: photo.storageKey,
             order: i,

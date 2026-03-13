@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 interface RatingFormProps {
   matchId: string;
@@ -65,6 +66,7 @@ const SUBTENANT_FIELDS: { name: string; label: string }[] = [
 
 export default function RatingForm({ matchId, role }: RatingFormProps) {
   const router = useRouter();
+  const { getToken } = useAuth();
   const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
   const fields = role === "LISTER_REVIEWS_SUBTENANT" ? LISTER_FIELDS : SUBTENANT_FIELDS;
@@ -82,10 +84,10 @@ export default function RatingForm({ matchId, role }: RatingFormProps) {
     setError(null);
 
     try {
+      const token = await getToken();
       const res = await fetch(`${API_URL}/v1/matches/${matchId}/reviews`, {
         method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ role, ...scores, comment: comment.trim() || undefined }),
       });
 

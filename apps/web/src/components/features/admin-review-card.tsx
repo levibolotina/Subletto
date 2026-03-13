@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 import Button from "@/components/ui/button";
 
 type LeasePermission = "PERMITTED" | "PROHIBITED" | "REQUIRES_LANDLORD_APPROVAL";
@@ -68,6 +69,7 @@ const ANSWER_LABEL: Record<string, string> = {
 };
 
 export default function AdminReviewCard({ verification, user }: AdminReviewCardProps) {
+  const { getToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [notes, setNotes] = useState("");
@@ -82,12 +84,15 @@ export default function AdminReviewCard({ verification, user }: AdminReviewCardP
     setLoading(true);
     setError(null);
     try {
+      const token = await getToken();
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/v1/admin/verify/${user.id}`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             status,
             subleasePermitted:

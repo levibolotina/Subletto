@@ -22,6 +22,8 @@ if (!allowedOrigin && process.env.NODE_ENV === "production") {
 app.register(cors, {
   origin: allowedOrigin || "http://localhost:3000",
   credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
 });
 app.register(helmet);
 // Global rate limit: 200 req/min per IP (permissive default, tightened per-route where needed)

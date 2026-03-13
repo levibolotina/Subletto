@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 
 type Listing = {
   id: string;
@@ -13,6 +14,7 @@ type Listing = {
 };
 
 export default function LandlordPacketPage() {
+  const { getToken } = useAuth();
   const [listings, setListings] = useState<Listing[]>([]);
   const [selectedListing, setSelectedListing] = useState("");
   const [landlordEmail, setLandlordEmail] = useState("");
@@ -24,13 +26,15 @@ export default function LandlordPacketPage() {
 
   // Load lister's listings
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/listings/mine`, {
-      credentials: "include",
-    })
-      .then((r) => r.json())
-      .then((d) => setListings(d.listings ?? []))
-      .catch(() => {});
-  }, []);
+    getToken().then((token) => {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/listings/mine`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((r) => r.json())
+        .then((d) => setListings(d.listings ?? []))
+        .catch(() => {});
+    });
+  }, [getToken]);
 
   const generate = async () => {
     if (!selectedListing) return;
@@ -39,12 +43,12 @@ export default function LandlordPacketPage() {
     setResult(null);
     setDownloadUrl(null);
     try {
+      const token = await getToken();
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/v1/documents/landlord-packet`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify({
             listingId: selectedListing,
             ...(landlordEmail ? { landlordEmail } : {}),
@@ -62,7 +66,7 @@ export default function LandlordPacketPage() {
       // Fetch a short-lived download URL via the documents API
       const docRes = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/v1/documents/${data.document?.matchId ?? "none"}`,
-        { credentials: "include" },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       // If no matchId, we can't use the match endpoint — the document portal
       // shows landlord packets too. For now, direct the user to /dashboard/documents.

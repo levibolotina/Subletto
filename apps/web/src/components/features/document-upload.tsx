@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import Button from "@/components/ui/button";
 
 type UploadStep = "idle" | "uploading" | "submitting" | "done" | "error";
@@ -42,6 +43,7 @@ async function uploadToStorage(signedUrl: string, file: File): Promise<void> {
 
 export default function DocumentUpload() {
   const router = useRouter();
+  const { getToken } = useAuth();
   const [step, setStep] = useState<UploadStep>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [idDoc, setIdDoc] = useState<FileState>({ file: null, path: null });
@@ -71,12 +73,15 @@ export default function DocumentUpload() {
 
       // 3. Submit paths to Fastify API
       setStep("submitting");
+      const token = await getToken();
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/v1/auth/verify`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             idDocPath: idUpload.storagePath,
             leaseDocPath: leaseUpload.storagePath,

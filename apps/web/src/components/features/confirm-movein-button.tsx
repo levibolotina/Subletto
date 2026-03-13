@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 export default function ConfirmMoveInButton({ matchId }: { matchId: string }) {
   const router = useRouter();
+  const { getToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,9 +19,10 @@ export default function ConfirmMoveInButton({ matchId }: { matchId: string }) {
     setLoading(true);
 
     try {
+      const token = await getToken();
       const res = await fetch(`${API_URL}/v1/matches/${matchId}/confirm-movein`, {
         method: "POST",
-        credentials: "include",
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!res.ok) {

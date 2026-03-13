@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import { formatCurrency } from "@subletto/shared";
 import { ESCROW_PLATFORM_FEE_PERCENT } from "@subletto/shared";
 
@@ -14,6 +15,7 @@ interface EscrowFormProps {
 
 export default function EscrowForm({ matchId, rentCents }: EscrowFormProps) {
   const router = useRouter();
+  const { getToken } = useAuth();
   const [depositCents, setDepositCents] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,10 +30,10 @@ export default function EscrowForm({ matchId, rentCents }: EscrowFormProps) {
     setLoading(true);
 
     try {
+      const token = await getToken();
       const res = await fetch(`${API_URL}/v1/matches/${matchId}/escrow`, {
         method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           firstMonthRentCents: rentCents,
           depositCents,

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
@@ -11,6 +12,7 @@ interface MatchRespondButtonsProps {
 
 export default function MatchRespondButtons({ matchId }: MatchRespondButtonsProps) {
   const router = useRouter();
+  const { getToken } = useAuth();
   const [loading, setLoading] = useState<"accept" | "decline" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,10 +21,10 @@ export default function MatchRespondButtons({ matchId }: MatchRespondButtonsProp
     setLoading(action);
 
     try {
+      const token = await getToken();
       const res = await fetch(`${API_URL}/v1/matches/${matchId}/respond`, {
         method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ action }),
       });
 

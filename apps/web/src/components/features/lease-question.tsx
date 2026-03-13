@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 type Answer = "YES" | "NO" | "UNKNOWN";
 
 export default function LeaseQuestion() {
   const router = useRouter();
+  const { getToken } = useAuth();
   const [answer, setAnswer] = useState<Answer | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -17,12 +19,15 @@ export default function LeaseQuestion() {
     setSaving(true);
     setError(null);
     try {
+      const token = await getToken();
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/v1/auth/lease-answer`,
         {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ listerLeaseAnswer: selected }),
         },
       );

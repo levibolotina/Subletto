@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 
 type ReportCategory = "SCAM" | "WRONG_INFO" | "INAPPROPRIATE";
 
@@ -18,6 +19,7 @@ const CATEGORIES: { value: ReportCategory; label: string; description: string }[
 
 export default function ReportButton({ listingId, reportedUserId, label = "Report" }: ReportButtonProps) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+  const { getToken } = useAuth();
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState<ReportCategory | "">("");
   const [description, setDescription] = useState("");
@@ -32,10 +34,10 @@ export default function ReportButton({ listingId, reportedUserId, label = "Repor
     setError(null);
 
     try {
+      const token = await getToken();
       const res = await fetch(`${API_URL}/v1/reports`, {
         method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           category,
           description: description.trim() || undefined,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { BOULDER_NEIGHBORHOODS } from "@subletto/shared";
 import Button from "@/components/ui/button";
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function SavedSearchForm({ initialFilters = {}, onCreated }: Props) {
+  const { getToken } = useAuth();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,10 +38,10 @@ export default function SavedSearchForm({ initialFilters = {}, onCreated }: Prop
     };
 
     try {
+      const token = await getToken();
       const res = await fetch(`${API_URL}/v1/saved-searches`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(body),
       });
       if (!res.ok) {

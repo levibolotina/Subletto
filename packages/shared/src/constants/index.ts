@@ -38,7 +38,7 @@ export const MAX_LEASE_DOC_SIZE = 20 * 1024 * 1024; // 20 MB
 export const MAX_LISTING_PHOTO_SIZE = 10 * 1024 * 1024; // 10 MB
 
 export const ALLOWED_ID_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
-export const ALLOWED_LEASE_MIME_TYPES = ["application/pdf"];
+export const ALLOWED_LEASE_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 export const ALLOWED_LISTING_PHOTO_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 // 7-day availability confirmation

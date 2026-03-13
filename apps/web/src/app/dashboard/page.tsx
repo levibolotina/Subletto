@@ -152,7 +152,7 @@ export default async function DashboardPage() {
                 Verify your identity to start listing
               </h2>
               <p className="mt-1 text-sm text-amber-700">
-                Upload your government ID and lease document. Usually approved
+                Upload your government ID and proof of residency. Usually approved
                 within 24 hours.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">

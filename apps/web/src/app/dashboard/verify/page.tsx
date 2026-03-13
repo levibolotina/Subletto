@@ -24,12 +24,12 @@ export default async function VerifyPage() {
           Step 3 of 3
         </p>
         <h1 className="mt-1.5 text-2xl font-extrabold text-slate-900">
-          Identity &amp; Lease Verification
+          Identity Verification
         </h1>
         <p className="mt-2 text-sm text-slate-500">
           To list your sublease, we need to verify your identity and confirm
-          that your lease permits subleasing. All documents are encrypted at
-          rest and only accessible to our admin team.
+          your address. All documents are encrypted at rest and only accessible
+          to our admin team.
         </p>
       </div>
 

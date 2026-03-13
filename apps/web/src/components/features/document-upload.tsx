@@ -47,28 +47,28 @@ export default function DocumentUpload() {
   const [step, setStep] = useState<UploadStep>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [idDoc, setIdDoc] = useState<FileState>({ file: null, path: null });
-  const [leaseDoc, setLeaseDoc] = useState<FileState>({ file: null, path: null });
+  const [residencyDoc, setResidencyDoc] = useState<FileState>({ file: null, path: null });
   const idInputRef = useRef<HTMLInputElement>(null);
-  const leaseInputRef = useRef<HTMLInputElement>(null);
+  const residencyInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!idDoc.file || !leaseDoc.file) return;
+    if (!idDoc.file || !residencyDoc.file) return;
 
     setStep("uploading");
     setErrorMsg(null);
 
     try {
       // 1. Get signed upload URLs
-      const [idUpload, leaseUpload] = await Promise.all([
+      const [idUpload, residencyUpload] = await Promise.all([
         getSignedUploadUrl("id", idDoc.file),
-        getSignedUploadUrl("lease", leaseDoc.file),
+        getSignedUploadUrl("lease", residencyDoc.file),
       ]);
 
       // 2. Upload directly to Supabase Storage
       await Promise.all([
         uploadToStorage(idUpload.signedUrl, idDoc.file),
-        uploadToStorage(leaseUpload.signedUrl, leaseDoc.file),
+        uploadToStorage(residencyUpload.signedUrl, residencyDoc.file),
       ]);
 
       // 3. Submit paths to Fastify API
@@ -84,7 +84,7 @@ export default function DocumentUpload() {
           },
           body: JSON.stringify({
             idDocPath: idUpload.storagePath,
-            leaseDocPath: leaseUpload.storagePath,
+            leaseDocPath: residencyUpload.storagePath,
           }),
         },
       );
@@ -148,33 +148,34 @@ export default function DocumentUpload() {
         </div>
       </div>
 
-      {/* Lease document */}
+      {/* Proof of Residency */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h2 className="font-semibold">Lease document</h2>
+        <h2 className="font-semibold">Proof of Residency</h2>
         <p className="mt-1 text-sm text-gray-500">
-          Your current lease showing the CU Boulder area address. PDF only, max 20 MB.
+          A utility bill, bank statement, shipping/delivery receipt, or any official mail
+          showing your name and address. JPG, PNG, or PDF, max 20 MB.
         </p>
         <input
-          ref={leaseInputRef}
+          ref={residencyInputRef}
           type="file"
-          accept=".pdf"
+          accept=".jpg,.jpeg,.png,.webp,.pdf"
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0] ?? null;
-            setLeaseDoc({ file, path: null });
+            setResidencyDoc({ file, path: null });
           }}
         />
         <div className="mt-4 flex items-center gap-3">
           <Button
             type="button"
             variant="secondary"
-            onClick={() => leaseInputRef.current?.click()}
+            onClick={() => residencyInputRef.current?.click()}
             disabled={isLoading}
           >
-            {leaseDoc.file ? "Change file" : "Choose file"}
+            {residencyDoc.file ? "Change file" : "Choose file"}
           </Button>
-          {leaseDoc.file && (
-            <span className="truncate text-sm text-gray-600">{leaseDoc.file.name}</span>
+          {residencyDoc.file && (
+            <span className="truncate text-sm text-gray-600">{residencyDoc.file.name}</span>
           )}
         </div>
       </div>
@@ -185,7 +186,7 @@ export default function DocumentUpload() {
 
       <Button
         type="submit"
-        disabled={!idDoc.file || !leaseDoc.file}
+        disabled={!idDoc.file || !residencyDoc.file}
         loading={isLoading}
         className="w-full"
       >

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const SubmitVerificationSchema = z.object({
   idDocPath: z.string().min(1, "Government ID document path is required"),
-  leaseDocPath: z.string().min(1, "Lease document path is required"),
+  leaseDocPath: z.string().min(1, "Proof of residency document path is required"),
   listerLeaseAnswer: z.enum(["YES", "NO", "UNKNOWN"]).optional(),
 });
 

@@ -168,10 +168,10 @@ export default function AdminReviewCard({ verification, user }: AdminReviewCardP
             rel="noopener noreferrer"
             className="text-sm font-medium text-indigo-600 underline hover:text-indigo-800"
           >
-            View Lease Document
+            View Proof of Residency
           </a>
         ) : (
-          <span className="text-sm text-slate-400">Lease doc unavailable</span>
+          <span className="text-sm text-slate-400">Residency doc unavailable</span>
         )}
       </div>
 

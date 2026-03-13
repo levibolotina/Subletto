@@ -20,6 +20,7 @@ export default function LeaseQuestion() {
     setError(null);
     try {
       const token = await getToken();
+      if (!token) throw new Error("No auth token available");
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/v1/auth/lease-answer`,
         {

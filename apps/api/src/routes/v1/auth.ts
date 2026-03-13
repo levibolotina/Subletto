@@ -54,7 +54,7 @@ export async function authRoutes(fastify: FastifyInstance) {
   // PATCH /v1/auth/lease-answer — lister self-reports whether lease permits subletting
   fastify.patch(
     "/auth/lease-answer",
-    { preHandler: [fastify.authenticate] },
+    { config: { rateLimit: { max: 10, timeWindow: "1 hour" } }, preHandler: [fastify.authenticate] },
     async (request, reply) => {
       const user = request.dbUser!;
       const result = SetLeaseAnswerSchema.safeParse(request.body);

@@ -79,6 +79,36 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── Intent Split CTA ──────────────────────────────────────────── */}
+      <section className="bg-white px-4 py-14">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+            What brings you here?
+          </h2>
+          <p className="mt-3 text-slate-500">
+            Whether you need a place or have one to offer, Subletto has you covered.
+          </p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            <Link
+              href="/listings"
+              className="flex flex-col items-center gap-3 rounded-2xl border-2 border-indigo-100 bg-indigo-50 px-8 py-8 text-center transition hover:border-indigo-400 hover:shadow-md active:scale-95"
+            >
+              <span className="text-4xl">🔍</span>
+              <span className="text-lg font-bold text-slate-900">Find a sublease</span>
+              <span className="text-sm text-slate-500">Browse verified listings near campus</span>
+            </Link>
+            <Link
+              href="/onboarding"
+              className="flex flex-col items-center gap-3 rounded-2xl border-2 border-slate-200 bg-slate-50 px-8 py-8 text-center transition hover:border-indigo-400 hover:shadow-md active:scale-95"
+            >
+              <span className="text-4xl">🏠</span>
+              <span className="text-lg font-bold text-slate-900">List your place</span>
+              <span className="text-sm text-slate-500">Sublet your apartment to verified students</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ── Waitlist Banner (signed-out only) ─────────────────────────── */}
       <SignedOut>
         <section className="bg-indigo-600 px-4 py-10">

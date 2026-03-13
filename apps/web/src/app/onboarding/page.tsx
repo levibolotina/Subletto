@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useUser, useAuth } from "@clerk/nextjs";
 
 type Role = "LISTER" | "SEEKER";
 
@@ -53,6 +53,7 @@ function ProgressBar({ step, total }: { step: number; total: number }) {
 export default function OnboardingPage() {
   const router = useRouter();
   const { user } = useUser();
+  const { getToken } = useAuth();
   const [step, setStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [loading, setLoading] = useState(false);
@@ -71,16 +72,23 @@ export default function OnboardingPage() {
     setLoading(true);
     setError(null);
     try {
+      const token = await getToken();
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/v1/auth/role`,
         {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ role: selectedRole }),
         },
       );
-      if (!res.ok) throw new Error("Failed to set role");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        console.error("PATCH /v1/auth/role failed", res.status, body);
+        throw new Error("Failed to set role");
+      }
       setStep(3);
       // Brief pause to show completion state before redirect
       setTimeout(() => {

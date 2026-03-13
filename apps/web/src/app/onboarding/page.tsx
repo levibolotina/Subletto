@@ -73,29 +73,33 @@ export default function OnboardingPage() {
     setError(null);
     try {
       const token = await getToken();
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/auth/role`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ role: selectedRole }),
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/v1/auth/role`;
+      console.error("PATCH /v1/auth/role — token:", token, "url:", url);
+      if (!token) {
+        throw new Error("No auth token available");
+      }
+      const res = await fetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify({ role: selectedRole }),
+      });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         console.error("PATCH /v1/auth/role failed", res.status, body);
-        throw new Error("Failed to set role");
+        throw new Error(
+          `Failed to set role (${res.status}): ${body?.message ?? body?.error ?? JSON.stringify(body)}`,
+        );
       }
       setStep(3);
       // Brief pause to show completion state before redirect
       setTimeout(() => {
         router.push(selectedRole === "LISTER" ? "/dashboard/verify" : "/dashboard");
       }, 1200);
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
       setLoading(false);
     }
   };

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import Navbar from "@/components/ui/navbar";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const playfairDisplay = Playfair_Display({ subsets: ["latin"], variable: "--font-display" });
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://subletto.co";
 
@@ -56,7 +57,7 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en" className={inter.variable}>
+      <html lang="en" className={`${inter.variable} ${playfairDisplay.variable}`}>
         <body className="min-h-screen bg-white font-sans antialiased">
           <Navbar />
           {children}

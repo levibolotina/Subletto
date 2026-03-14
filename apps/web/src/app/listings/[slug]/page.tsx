@@ -65,7 +65,7 @@ export default async function ListingDetailPage({ params }: Props) {
     where: { slug: params.slug },
     include: {
       photos: { orderBy: { order: "asc" } },
-      owner: { select: { verifiedAt: true } },
+      owner: { select: { verifiedAt: true, email: true } },
     },
   });
 
@@ -73,173 +73,136 @@ export default async function ListingDetailPage({ params }: Props) {
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 
-  const amenities = [
-    listing.furnished && "Furnished",
-    listing.petFriendly && "Pets welcome",
-    listing.parking && "Parking included",
-  ].filter(Boolean) as string[];
-
   const photos = listing.photos.map((p) => ({
     storageKey: p.storageKey,
     order: p.order,
     isPrimary: p.isPrimary,
   }));
 
+  const maskedEmail = listing.owner.email.slice(0, 3) + "***";
+
+  const fromDate = new Date(listing.availableFrom).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+  const toDate = new Date(listing.availableTo).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
   return (
     <>
-      {/* Add bottom padding on mobile so sticky bar doesn't overlap */}
-      <main className="mx-auto max-w-4xl px-4 py-6 pb-28 lg:pb-10">
+      <main className="mx-auto max-w-5xl px-4 py-8 pb-28 lg:pb-8">
+        {/* Photo gallery */}
         <PhotoCarousel
           photos={photos}
           supabaseUrl={supabaseUrl}
           neighborhood={listing.neighborhood}
         />
 
-        <div className="flex flex-col gap-8 lg:flex-row">
-          {/* ── Main info ─────────────────────────────────────────── */}
-          <div className="flex-1">
-            {/* Header */}
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-indigo-500">
-                  {listing.neighborhood} · Boulder, CO
-                </p>
-                <h1 className="mt-1.5 text-2xl font-bold text-slate-900 sm:text-3xl">
-                  {listing.title}
-                </h1>
-                <p className="mt-1 text-slate-500">
-                  {listing.bedrooms === 0 ? "Studio" : `${listing.bedrooms} bed`}{" "}
-                  · {listing.bathrooms} bath
-                </p>
-              </div>
+        {/* Two-column layout */}
+        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* LEFT COLUMN */}
+          <div className="lg:col-span-2">
+            {/* Badges */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+                {listing.neighborhood}
+              </span>
               {listing.owner.verifiedAt && (
-                <div className="shrink-0">
-                  <VerificationBadge status="VERIFIED" role="LISTER" />
-                </div>
+                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                  ✓ Verified
+                </span>
               )}
             </div>
 
+            {/* Title */}
+            <h1 className="mt-2 font-display text-3xl font-bold text-gray-900">
+              {listing.title}
+            </h1>
+
             {/* Price */}
-            <div className="mt-4 flex items-baseline gap-1.5">
-              <span className="text-4xl font-extrabold text-slate-900">
+            <div className="mt-2 flex items-baseline gap-1.5">
+              <span className="text-3xl font-bold text-blue-600">
                 {formatCurrency(listing.rentCents)}
               </span>
-              <span className="text-slate-400">/month</span>
+              <span className="text-lg text-gray-400">/month</span>
             </div>
 
-            {/* Dates */}
-            <div className="mt-5 flex flex-wrap gap-4 rounded-xl bg-slate-50 p-4 text-sm">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                  Available from
-                </p>
-                <p className="mt-0.5 font-semibold text-slate-800">
-                  {new Date(listing.availableFrom).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </p>
-              </div>
-              <div className="h-auto w-px bg-slate-200" />
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                  Until
-                </p>
-                <p className="mt-0.5 font-semibold text-slate-800">
-                  {new Date(listing.availableTo).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </p>
-              </div>
+            {/* Details row */}
+            <div className="mt-4 flex flex-wrap gap-6 text-sm text-gray-700">
+              <span>
+                🛏{" "}
+                <span className="font-medium">
+                  {listing.bedrooms === 0 ? "Studio" : `${listing.bedrooms} bed`}
+                </span>
+              </span>
+              <span>
+                🚿{" "}
+                <span className="font-medium">{listing.bathrooms} bath</span>
+              </span>
             </div>
 
-            {/* Amenities */}
-            {amenities.length > 0 && (
-              <div className="mt-6">
-                <h2 className="font-semibold text-slate-900">Amenities</h2>
-                <div className="mt-2.5 flex flex-wrap gap-2">
-                  {amenities.map((a) => (
-                    <span
-                      key={a}
-                      className="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm text-slate-700"
-                    >
-                      {a}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+            <hr className="my-6 border-gray-200" />
+
+            {/* Available dates */}
+            <div>
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-400">
+                Available dates
+              </h2>
+              <p className="mt-1 text-gray-800">
+                {fromDate} — {toDate}
+              </p>
+            </div>
+
+            <hr className="my-6 border-gray-200" />
 
             {/* Description */}
-            {listing.description && (
-              <div className="mt-6">
-                <h2 className="font-semibold text-slate-900">
-                  About this place
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600 whitespace-pre-line">
-                  {listing.description}
-                </p>
-              </div>
-            )}
-
-            {/* Neighborhood zone note */}
-            <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">📍</span>
-                <div>
-                  <p className="text-sm font-semibold text-slate-800">
-                    {listing.neighborhood}, Boulder CO
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    Exact address shared after you connect with the lister
-                  </p>
-                </div>
-              </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">
+                About this sublease
+              </h2>
+              <p className="mt-2 leading-relaxed text-gray-600 whitespace-pre-line">
+                {listing.description ?? "No description provided."}
+              </p>
             </div>
 
-            {/* Privacy notice */}
-            <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-              <strong>🔒 Address and contact info revealed only after payment.</strong>{" "}
-              All transactions are handled securely through Subletto.
+            <hr className="my-6 border-gray-200" />
+
+            {/* Map placeholder */}
+            <div className="flex h-48 items-center justify-center rounded-2xl bg-gray-100">
+              <span className="text-gray-500">
+                📍 {listing.neighborhood}, Boulder CO
+              </span>
             </div>
           </div>
 
-          {/* ── Desktop sidebar CTA ───────────────────────────────── */}
-          <aside className="hidden lg:block lg:w-72 lg:shrink-0">
-            <div className="sticky top-24 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <p className="text-3xl font-extrabold text-slate-900">
-                {formatCurrency(listing.rentCents)}
-                <span className="text-base font-normal text-slate-400">/mo</span>
-              </p>
-
-              <div className="mt-4 space-y-2 rounded-xl bg-slate-50 p-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Neighborhood</span>
-                  <span className="font-medium text-slate-800">
-                    {listing.neighborhood}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Beds / Baths</span>
-                  <span className="font-medium text-slate-800">
-                    {listing.bedrooms === 0 ? "Studio" : listing.bedrooms} /{" "}
-                    {listing.bathrooms}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Available</span>
-                  <span className="font-medium text-slate-800">
-                    {new Date(listing.availableFrom).toLocaleDateString(
-                      "en-US",
-                      { month: "short", day: "numeric" },
-                    )}
-                  </span>
-                </div>
+          {/* RIGHT COLUMN */}
+          <aside className="hidden lg:block">
+            <div className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              {/* Price */}
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-3xl font-bold text-blue-600">
+                  {formatCurrency(listing.rentCents)}
+                </span>
+                <span className="text-lg text-gray-400">/month</span>
               </div>
 
+              {/* Available dates */}
+              <div className="mt-4 text-sm text-gray-600">
+                <p>
+                  <span className="font-medium text-gray-800">From:</span>{" "}
+                  {fromDate}
+                </p>
+                <p className="mt-1">
+                  <span className="font-medium text-gray-800">To:</span>{" "}
+                  {toDate}
+                </p>
+              </div>
+
+              {/* CTA */}
               <div className="mt-5">
                 <MatchRequestButton
                   listingId={listing.id}
@@ -247,22 +210,37 @@ export default async function ListingDetailPage({ params }: Props) {
                 />
               </div>
 
-              <p className="mt-3 text-center text-xs text-slate-400">
-                $99 connection fee · Full refund if declined
+              <hr className="my-5 border-gray-200" />
+
+              {/* Lister info */}
+              <div className="text-sm text-gray-600">
+                <p className="font-medium text-gray-800">Listed by</p>
+                <p className="mt-1">
+                  {maskedEmail}{" "}
+                  {listing.owner.verifiedAt && (
+                    <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
+                      ✓ Verified
+                    </span>
+                  )}
+                </p>
+              </div>
+
+              <p className="mt-4 text-xs text-gray-400">
+                Exact address shared after match is confirmed
               </p>
             </div>
           </aside>
         </div>
       </main>
 
-      {/* ── Mobile sticky bottom bar ─────────────────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white px-4 py-3 shadow-lg lg:hidden">
-        <div className="mx-auto flex max-w-4xl items-center gap-3">
+      {/* Mobile sticky bottom bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white px-4 py-3 shadow-lg lg:hidden">
+        <div className="mx-auto flex max-w-5xl items-center gap-3">
           <div>
-            <p className="text-xl font-extrabold text-slate-900">
+            <p className="text-xl font-bold text-blue-600">
               {formatCurrency(listing.rentCents)}
             </p>
-            <p className="text-xs text-slate-400">/month</p>
+            <p className="text-xs text-gray-400">/month</p>
           </div>
           <div className="flex-1">
             <MatchRequestButton

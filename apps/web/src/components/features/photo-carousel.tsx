@@ -23,8 +23,8 @@ export default function PhotoCarousel({
 
   if (photos.length === 0) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-2xl bg-slate-100 sm:h-80">
-        <p className="text-sm text-slate-400">No photos available</p>
+      <div className="mb-6 aspect-video w-full rounded-2xl bg-gray-100 flex items-center justify-center">
+        <span className="text-5xl">🏠</span>
       </div>
     );
   }
@@ -38,12 +38,12 @@ export default function PhotoCarousel({
   return (
     <div className="mb-6 space-y-2">
       {/* Main photo */}
-      <div className="relative overflow-hidden rounded-2xl bg-slate-100">
+      <div className="relative overflow-hidden rounded-2xl bg-gray-100">
         {/* eslint-disable-next-line @next/next-eslint/no-img-element */}
         <img
           src={photoUrl(photos[current]!.storageKey)}
           alt={`${neighborhood} — photo ${current + 1}`}
-          className="h-64 w-full object-cover sm:h-80 lg:h-96"
+          className="aspect-video w-full object-cover"
         />
 
         {/* Nav arrows */}
@@ -79,17 +79,17 @@ export default function PhotoCarousel({
             <button
               key={photo.storageKey}
               onClick={() => setCurrent(i)}
-              className={`shrink-0 overflow-hidden rounded-lg border-2 transition ${
+              className={`shrink-0 overflow-hidden rounded-xl border-2 transition ${
                 i === current
-                  ? "border-indigo-600"
-                  : "border-transparent hover:border-slate-300"
+                  ? "border-blue-600"
+                  : "border-transparent hover:border-gray-300"
               }`}
             >
               {/* eslint-disable-next-line @next/next-eslint/no-img-element */}
               <img
                 src={photoUrl(photo.storageKey)}
                 alt=""
-                className="h-16 w-20 object-cover"
+                className="h-20 cursor-pointer object-cover"
               />
             </button>
           ))}

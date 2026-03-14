@@ -78,8 +78,13 @@ export default async function ListingsPage({
       where,
       include: {
         photos: { orderBy: { order: "asc" } },
-        owner: { select: { verifiedAt: true, trustScore: true } },
-        reviews: { select: { id: true } },
+        owner: {
+          select: {
+            verifiedAt: true,
+            trustScore: true,
+            _count: { select: { reviewsReceived: true } },
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * pageSize,
@@ -105,7 +110,7 @@ export default async function ListingsPage({
     availableTo: l.availableTo.toISOString(),
     ownerVerified: !!l.owner.verifiedAt,
     ownerTrustScore: l.owner.trustScore,
-    ownerReviewCount: l.reviews.length,
+    ownerReviewCount: l.owner._count.reviewsReceived,
     isFlagged: l.isFlagged,
     photos: l.photos.map((p) => ({
       storageKey: p.storageKey,
@@ -235,7 +240,7 @@ function ListingPageCard({ listing }: { listing: ListingPublicView }) {
       {/* Photo — 16:9 */}
       <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
         {primaryPhoto ? (
-          // eslint-disable-next-line @next/next-eslint/no-img-element
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/listing-photos/${primaryPhoto.storageKey}`}
             alt={listing.title}

@@ -25,383 +25,280 @@ export default async function HomePage() {
   } catch (err) {
     console.error("[HomePage] DB fetch failed:", err);
   }
-  return (
-    <main>
-      {/* ── Hero ─────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-500 to-violet-600 px-4 pb-24 pt-20 text-white">
-        {/* Decorative blobs */}
-        <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-violet-500/30 blur-3xl" />
 
-        <div className="relative mx-auto max-w-4xl text-center">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-sm font-medium backdrop-blur-sm">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-green-400" />
-            CU Boulder students only
+  void successStories; // fetched for future use
+
+  return (
+    <main className="font-sans">
+
+      {/* ── Navbar ──────────────────────────────────────────────────────── */}
+      <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/90 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          {/* Wordmark */}
+          <Link href="/" className="font-display text-xl font-bold text-gray-900">
+            Subletto
+          </Link>
+
+          {/* Center nav links */}
+          <div className="hidden items-center gap-8 md:flex">
+            <Link href="/listings" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+              Browse
+            </Link>
+            <a href="#how-it-works" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+              How it works
+            </a>
           </div>
 
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
-            Find your sublease.{" "}
-            <span className="text-indigo-200">Safely.</span>
-          </h1>
-
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-indigo-100 sm:text-xl">
-            The only sublease marketplace built for CU Boulder students —
-            verified identities, secure payments, zero scams.
-          </p>
-
-          <div className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
+          {/* Right actions */}
+          <div className="flex items-center gap-3">
             <SignedOut>
               <Link
-                href="/sign-up"
-                className="rounded-xl bg-white px-8 py-4 text-center text-base font-bold text-indigo-600 shadow-lg transition hover:bg-indigo-50 active:scale-95"
+                href="/sign-in"
+                className="hidden text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors sm:block"
               >
-                Get started — it&apos;s free
+                Log in
               </Link>
               <Link
-                href="/listings"
-                className="rounded-xl border-2 border-white/40 px-8 py-4 text-center text-base font-semibold text-white transition hover:border-white/70 active:scale-95"
+                href="/sign-up"
+                className="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-95"
               >
-                Browse listings
+                Get Started
               </Link>
             </SignedOut>
             <SignedIn>
               <Link
                 href="/dashboard"
-                className="rounded-xl bg-white px-8 py-4 text-center text-base font-bold text-indigo-600 shadow-lg transition hover:bg-indigo-50 active:scale-95"
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
               >
-                Go to dashboard
-              </Link>
-              <Link
-                href="/listings"
-                className="rounded-xl border-2 border-white/40 px-8 py-4 text-center text-base font-semibold text-white transition hover:border-white/70 active:scale-95"
-              >
-                Browse listings
+                Dashboard
               </Link>
             </SignedIn>
           </div>
-
-          {/* Social proof */}
-          <p className="mt-8 text-sm text-indigo-200">
-            Trusted by CU Boulder students • Verified listings only
-          </p>
         </div>
-      </section>
+      </nav>
 
-      {/* ── Intent Split CTA ──────────────────────────────────────────── */}
-      <section className="bg-white px-4 py-14">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-            What brings you here?
-          </h2>
-          <p className="mt-3 text-slate-500">
-            Whether you need a place or have one to offer, Subletto has you covered.
+      {/* ── Hero ────────────────────────────────────────────────────────── */}
+      <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
+        {/* Background image */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600"
+          alt="Boulder Colorado Flatirons"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-black/50" />
+
+        {/* Content */}
+        <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
+          {/* Badge */}
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
+            🎓 CU Boulder Students Only
+          </div>
+
+          {/* Headline */}
+          <h1 className="font-display text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
+            Your Next Sublease,
+            <br />
+            <span className="text-blue-400">Found.</span>
+          </h1>
+
+          {/* Subheadline */}
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-white/80 sm:text-xl">
+            The only verified sublease marketplace built exclusively for CU Boulder students.
           </p>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+
+          {/* CTAs */}
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/listings"
-              className="flex flex-col items-center gap-3 rounded-2xl border-2 border-indigo-100 bg-indigo-50 px-8 py-8 text-center transition hover:border-indigo-400 hover:shadow-md active:scale-95"
+              className="rounded-full bg-white px-8 py-3.5 text-base font-semibold text-gray-900 shadow-lg transition hover:bg-gray-100 active:scale-95"
             >
-              <span className="text-4xl">🔍</span>
-              <span className="text-lg font-bold text-slate-900">Find a sublease</span>
-              <span className="text-sm text-slate-500">Browse verified listings near campus</span>
+              Browse Listings
             </Link>
-            <Link
-              href="/onboarding"
-              className="flex flex-col items-center gap-3 rounded-2xl border-2 border-slate-200 bg-slate-50 px-8 py-8 text-center transition hover:border-indigo-400 hover:shadow-md active:scale-95"
-            >
-              <span className="text-4xl">🏠</span>
-              <span className="text-lg font-bold text-slate-900">List your place</span>
-              <span className="text-sm text-slate-500">Sublet your apartment to verified students</span>
-            </Link>
+            <SignedOut>
+              <Link
+                href="/sign-up"
+                className="rounded-full bg-blue-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg transition hover:bg-blue-700 active:scale-95"
+              >
+                List Your Place
+              </Link>
+            </SignedOut>
+            <SignedIn>
+              <Link
+                href="/dashboard/listings/new"
+                className="rounded-full bg-blue-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg transition hover:bg-blue-700 active:scale-95"
+              >
+                List Your Place
+              </Link>
+            </SignedIn>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-white/60">
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </section>
+
+      {/* ── Stats Bar ───────────────────────────────────────────────────── */}
+      <section className="border-b border-gray-100 bg-white py-8">
+        <div className="mx-auto max-w-4xl px-6">
+          <div className="grid grid-cols-3 divide-x divide-gray-100 text-center">
+            <div className="px-6">
+              <p className="font-display text-3xl font-bold text-blue-600">
+                {waitlistCount > 0 ? `${waitlistCount.toLocaleString()}+` : "200+"}
+              </p>
+              <p className="mt-1 text-sm text-gray-500">Students</p>
+            </div>
+            <div className="px-6">
+              <p className="font-display text-3xl font-bold text-blue-600">100%</p>
+              <p className="mt-1 text-sm text-gray-500">Verified</p>
+            </div>
+            <div className="px-6">
+              <p className="font-display text-3xl font-bold text-blue-600">CU</p>
+              <p className="mt-1 text-sm text-gray-500">Boulder Only</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── Waitlist Banner (signed-out only) ─────────────────────────── */}
-      <SignedOut>
-        <section className="bg-indigo-600 px-4 py-10">
-          <div className="mx-auto max-w-2xl text-center text-white">
-            <p className="text-sm font-semibold uppercase tracking-widest text-indigo-200">
-              Early access
-            </p>
-            <h2 className="mt-2 text-2xl font-bold sm:text-3xl">
-              Join {waitlistCount > 0 ? `${waitlistCount.toLocaleString()}+ ` : ""}CU students on the waitlist
-            </h2>
-            <p className="mt-2 text-indigo-200">
-              Be the first to access verified subleases when we launch.
-            </p>
-            <Link
-              href="/waitlist"
-              className="mt-6 inline-block rounded-xl bg-white px-8 py-3 text-sm font-bold text-indigo-600 shadow-lg transition hover:bg-indigo-50 active:scale-95"
-            >
-              Get early access →
-            </Link>
-          </div>
-        </section>
-      </SignedOut>
-
-      {/* ── Trust Signals ─────────────────────────────────────────────── */}
-      <section className="bg-white px-4 py-16">
+      {/* ── How It Works ────────────────────────────────────────────────── */}
+      <section id="how-it-works" className="bg-gray-50 px-6 py-24">
         <div className="mx-auto max-w-5xl">
-          <div className="mb-10 text-center">
-            <h2 className="text-3xl font-bold text-slate-900">
-              Why students trust Subletto
+          <div className="mb-14 text-center">
+            <p className="text-sm font-semibold uppercase tracking-widest text-blue-600">
+              Simple Process
+            </p>
+            <h2 className="font-display mt-3 text-4xl font-bold text-gray-900">
+              Find your sublease in 3 steps
             </h2>
-            <p className="mt-3 text-slate-500">
-              Every listing is backed by real verification
-            </p>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-3">
-            {[
-              {
-                icon: "🎓",
-                title: ".edu emails only",
-                desc: "Only CU Boulder students can sign up. No randos, no scammers.",
-              },
-              {
-                icon: "🪪",
-                title: "ID + lease verified",
-                desc: "Listers submit a government ID and active lease to our team before going live.",
-              },
-              {
-                icon: "🔒",
-                title: "Secure payments",
-                desc: "The $99 connection fee is held in escrow. You get a full refund if the lister declines.",
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="flex flex-col items-center rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center"
-              >
-                <div className="mb-3 text-4xl">{item.icon}</div>
-                <h3 className="font-semibold text-slate-900">{item.title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-slate-500">
-                  {item.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Verified badge explainer */}
-          <div className="mt-8 flex flex-col items-start gap-4 rounded-2xl border border-indigo-100 bg-indigo-50 p-6 sm:flex-row sm:items-center">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-100">
-              <svg
-                className="h-6 w-6 text-indigo-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                />
-              </svg>
-            </div>
-            <div>
-              <p className="font-semibold text-indigo-900">
-                What does the{" "}
-                <span className="inline-flex items-center gap-1 rounded-full bg-indigo-100 px-2 py-0.5 text-xs text-indigo-700">
-                  ✓ Verified
-                </span>{" "}
-                badge mean?
-              </p>
-              <p className="mt-1 text-sm leading-relaxed text-indigo-700">
-                Listers with a Verified badge have submitted a government-issued
-                ID and their current lease to our admin team. We confirm the
-                sublease is legitimate before it goes live — so you can browse
-                with confidence.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── How It Works ──────────────────────────────────────────────── */}
-      <section className="bg-slate-50 px-4 py-16">
-        <div className="mx-auto max-w-4xl">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold text-slate-900">How it works</h2>
-            <p className="mt-3 text-slate-500">
-              From listing to move-in in three simple steps
-            </p>
-          </div>
-
-          <div className="relative grid gap-10 md:grid-cols-3">
-            {/* Connector line (desktop) */}
-            <div className="absolute left-[16.67%] right-[16.67%] top-5 hidden h-0.5 bg-indigo-200 md:block" />
-
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
             {[
               {
                 step: "01",
-                emoji: "🏠",
-                title: "List or browse",
-                desc: "Listers post their verified sublease. Seekers browse anonymized listings — no personal info exposed until you match.",
+                emoji: "🔍",
+                title: "Browse verified listings",
+                desc: "Search CU-exclusive subleases near campus. Every listing is from a verified student.",
               },
               {
                 step: "02",
-                emoji: "🤝",
+                emoji: "✅",
                 title: "Request a match",
-                desc: "Pay the $99 connection fee. The lister accepts or declines within 48 hours. Full refund if declined, no questions asked.",
+                desc: "Pay the $99 connection fee. Lister accepts or declines within 48 hours. Full refund if declined.",
               },
               {
                 step: "03",
-                emoji: "📦",
-                title: "Move in",
-                desc: "Contact info unlocked. Optionally use Subletto escrow for first month + deposit. Funds release on move-in day.",
+                emoji: "🤝",
+                title: "Sign & move in",
+                desc: "Contact info unlocked. Use Subletto escrow for deposit security. Move in with confidence.",
               },
             ].map((item) => (
               <div
                 key={item.step}
-                className="relative flex flex-col items-center text-center"
+                className="flex flex-col items-center rounded-2xl bg-white p-8 text-center shadow-sm"
               >
-                <div className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white shadow-md shadow-indigo-200">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
                   {item.step}
                 </div>
                 <div className="mt-5 text-4xl">{item.emoji}</div>
-                <h3 className="mt-3 font-semibold text-slate-900">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-500">
-                  {item.desc}
-                </p>
+                <h3 className="mt-4 text-base font-bold text-gray-900">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-500">{item.desc}</p>
               </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          <div className="mt-14 flex justify-center">
+      {/* ── Intent Split CTA ────────────────────────────────────────────── */}
+      <section className="bg-white px-6 py-20">
+        <div className="mx-auto max-w-3xl">
+          <h2 className="font-display mb-10 text-center text-3xl font-bold text-gray-900">
+            What brings you here?
+          </h2>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <Link
               href="/listings"
-              className="rounded-xl bg-indigo-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-700 active:scale-95"
+              className="flex flex-col items-center rounded-2xl border-2 border-gray-100 p-8 text-center transition hover:border-blue-400 hover:shadow-lg cursor-pointer"
             >
-              Browse available subleases →
+              <span className="text-5xl">🔍</span>
+              <h3 className="mt-5 text-lg font-bold text-gray-900">Find a Sublease</h3>
+              <p className="mt-2 text-sm text-gray-500">
+                Browse verified listings near CU Boulder campus from real students.
+              </p>
+            </Link>
+            <Link
+              href="/onboarding"
+              className="flex flex-col items-center rounded-2xl border-2 border-gray-100 p-8 text-center transition hover:border-blue-400 hover:shadow-lg cursor-pointer"
+            >
+              <span className="text-5xl">🏠</span>
+              <h3 className="mt-5 text-lg font-bold text-gray-900">List Your Place</h3>
+              <p className="mt-2 text-sm text-gray-500">
+                Sublet your apartment to verified CU Boulder students in minutes.
+              </p>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── CTA Banner ────────────────────────────────────────────────── */}
-      <section className="bg-white px-4 py-16">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
-            Have a sublease to offer?
-          </h2>
-          <p className="mt-3 text-slate-500">
-            List your unit in minutes. Reach verified CU Boulder students
-            actively looking for a place.
-          </p>
-          <SignedOut>
-            <Link
-              href="/sign-up"
-              className="mt-8 inline-block rounded-xl bg-indigo-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-700"
-            >
-              List your unit →
-            </Link>
-          </SignedOut>
-          <SignedIn>
-            <Link
-              href="/dashboard/listings/new"
-              className="mt-8 inline-block rounded-xl bg-indigo-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-700"
-            >
-              Create a listing →
-            </Link>
-          </SignedIn>
-        </div>
-      </section>
-
-      {/* ── Social Proof ──────────────────────────────────────────────── */}
-      {(approvedTestimonials.length > 0 || successStories.length > 0) && (
-        <section className="bg-slate-50 px-4 py-16">
+      {/* ── Testimonials ────────────────────────────────────────────────── */}
+      {approvedTestimonials.length > 0 && (
+        <section className="bg-gray-50 px-6 py-20">
           <div className="mx-auto max-w-5xl">
-            {approvedTestimonials.length > 0 && (
-              <>
-                <div className="mb-10 text-center">
-                  <h2 className="text-3xl font-bold text-slate-900">
-                    What students say
-                  </h2>
-                  <p className="mt-3 text-slate-500">Real experiences from CU Boulder students</p>
+            <h2 className="font-display mb-12 text-center text-3xl font-bold text-gray-900">
+              What students are saying
+            </h2>
+            <div className="grid gap-6 sm:grid-cols-3">
+              {approvedTestimonials.map((t) => (
+                <div
+                  key={t.id}
+                  className="flex flex-col rounded-2xl bg-white p-6 shadow-sm"
+                >
+                  <p className="flex-1 text-sm leading-relaxed text-gray-600 italic">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                  <p className="mt-4 text-xs font-semibold text-gray-400">
+                    — {t.displayName ?? "Anonymous CU Student"}
+                  </p>
                 </div>
-                <div className="grid gap-5 sm:grid-cols-3">
-                  {approvedTestimonials.map((t) => (
-                    <div
-                      key={t.id}
-                      className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6"
-                    >
-                      <p className="flex-1 text-sm leading-relaxed text-slate-600 italic">
-                        &ldquo;{t.quote}&rdquo;
-                      </p>
-                      <p className="mt-4 text-xs font-semibold text-slate-400">
-                        — {t.displayName ?? "Anonymous CU Student"}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-
-            {successStories.length > 0 && (
-              <div className={approvedTestimonials.length > 0 ? "mt-12" : ""}>
-                <div className="mb-6 text-center">
-                  <h2 className="text-2xl font-bold text-slate-900">
-                    Subleases matched so far
-                  </h2>
-                  <p className="mt-2 text-slate-500">Every match is a scam avoided</p>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-3">
-                  {successStories.map((s) => (
-                    <div
-                      key={s.id}
-                      className="rounded-2xl border border-indigo-100 bg-indigo-50 p-5"
-                    >
-                      <p className="text-lg font-bold text-indigo-600">
-                        {s.bedrooms}BR · {s.neighborhood}
-                      </p>
-                      <p className="mt-1 text-sm text-slate-600">
-                        ${Math.round(s.rentCents / 100)}/mo ·{" "}
-                        {new Date(s.fromDate).toLocaleDateString("en-US", {
-                          month: "short",
-                          year: "numeric",
-                        })}{" "}
-                        →{" "}
-                        {new Date(s.toDate).toLocaleDateString("en-US", {
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </p>
-                      <p className="mt-2 text-xs font-semibold text-indigo-500">
-                        ✓ Matched
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         </section>
       )}
 
-      {/* ── Footer ────────────────────────────────────────────────────── */}
-      <footer className="border-t border-slate-200 bg-slate-50 px-4 py-8">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row">
-          <p className="text-lg font-extrabold tracking-tight text-indigo-600">
-            Subletto
-          </p>
-          <p className="text-sm text-slate-400">
-            © 2026 Subletto · Built for CU Boulder students
-          </p>
-          <div className="flex gap-5 text-sm text-slate-500">
-            <Link href="/listings" className="hover:text-slate-900">
-              Browse
-            </Link>
-            <Link href="/waitlist" className="hover:text-slate-900">
-              Waitlist
-            </Link>
-            <Link href="/sign-up" className="hover:text-slate-900">
-              Sign up
-            </Link>
+      {/* ── Footer ──────────────────────────────────────────────────────── */}
+      <footer className="bg-slate-900 px-6 py-16 text-white">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
+            {/* Left */}
+            <div>
+              <p className="font-display text-xl font-bold text-white">Subletto</p>
+              <p className="mt-2 text-sm text-slate-400">
+                The verified sublease marketplace for CU Boulder
+              </p>
+            </div>
+
+            {/* Right links */}
+            <div className="flex gap-8 text-sm text-slate-400">
+              <Link href="/listings" className="hover:text-white transition-colors">
+                Browse
+              </Link>
+              <Link href="/onboarding" className="hover:text-white transition-colors">
+                List
+              </Link>
+              <Link href="/sign-in" className="hover:text-white transition-colors">
+                Sign in
+              </Link>
+            </div>
+          </div>
+
+          <div className="mt-12 border-t border-slate-800 pt-8 text-center text-sm text-slate-500">
+            © 2026 Subletto. For CU Boulder students only.
           </div>
         </div>
       </footer>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
-import Navbar from "@/components/ui/navbar";
+import Navbar from "@/components/layout/navbar";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const playfairDisplay = Playfair_Display({ subsets: ["latin"], variable: "--font-display" });

@@ -1,48 +1,41 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
-
 type Answer = "YES" | "NO" | "UNKNOWN";
 
-export default function LeaseQuestion() {
-  const router = useRouter();
-  const { getToken } = useAuth();
-  const [answer, setAnswer] = useState<Answer | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
+interface LeaseQuestionProps {
+  value: Answer | null;
+  onChange: (answer: Answer) => void;
+}
 
-  const save = async (selected: Answer) => {
-    setAnswer(selected);
-    setSaving(true);
-    setError(null);
-    try {
-      const token = await getToken();
-      if (!token) throw new Error("No auth token available");
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/auth/lease-answer`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ listerLeaseAnswer: selected }),
-        },
-      );
-      if (!res.ok) throw new Error("Failed to save answer");
-      setDone(true);
-    } catch {
-      setError("Something went wrong saving your answer. Please try again.");
-      setAnswer(null);
-    } finally {
-      setSaving(false);
-    }
-  };
+const OPTIONS = [
+  {
+    value: "YES" as Answer,
+    label: "Yes",
+    description: "My lease explicitly permits subletting.",
+    icon: "✅",
+    selectedBorder: "border-green-400 bg-green-50",
+    selectedText: "text-green-800",
+  },
+  {
+    value: "NO" as Answer,
+    label: "No",
+    description: "My lease prohibits or restricts subletting.",
+    icon: "🚫",
+    selectedBorder: "border-red-400 bg-red-50",
+    selectedText: "text-red-800",
+  },
+  {
+    value: "UNKNOWN" as Answer,
+    label: "I'm not sure",
+    description: "Upload your lease and we'll check for you.",
+    icon: "🔍",
+    selectedBorder: "border-amber-400 bg-amber-50",
+    selectedText: "text-amber-800",
+  },
+] as const;
 
-  if (done && answer === "NO") {
+export default function LeaseQuestion({ value, onChange }: LeaseQuestionProps) {
+  if (value === "NO") {
     return (
       <div className="mb-8 rounded-2xl border border-red-200 bg-red-50 p-6">
         <div className="mb-3 flex items-center gap-2">
@@ -72,15 +65,22 @@ export default function LeaseQuestion() {
             Get the Landlord Packet →
           </a>
         </div>
-        <p className="text-xs text-red-600">
+        <p className="mb-3 text-xs text-red-600">
           You can still upload your documents below — an admin will review
           whether subletting is permitted under your specific lease.
         </p>
+        <button
+          type="button"
+          onClick={() => onChange("YES")}
+          className="text-xs text-red-700 underline"
+        >
+          Change my answer
+        </button>
       </div>
     );
   }
 
-  if (done && answer === "UNKNOWN") {
+  if (value === "UNKNOWN") {
     return (
       <div className="mb-8 rounded-2xl border border-amber-200 bg-amber-50 p-6">
         <div className="mb-2 flex items-center gap-2">
@@ -89,23 +89,39 @@ export default function LeaseQuestion() {
             We&apos;ll review your lease
           </h2>
         </div>
-        <p className="text-sm text-amber-800">
+        <p className="mb-3 text-sm text-amber-800">
           Upload your lease below and our admin team will check whether
           subletting is permitted. You&apos;ll hear back within 24 hours.
         </p>
+        <button
+          type="button"
+          onClick={() => onChange("YES")}
+          className="text-xs text-amber-700 underline"
+        >
+          Change my answer
+        </button>
       </div>
     );
   }
 
-  if (done && answer === "YES") {
+  if (value === "YES") {
     return (
       <div className="mb-8 rounded-2xl border border-green-200 bg-green-50 p-5">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">✅</span>
-          <p className="text-sm font-semibold text-green-800">
-            Great — your lease permits subletting. Please upload your documents
-            below to complete verification.
-          </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">✅</span>
+            <p className="text-sm font-semibold text-green-800">
+              Great — your lease permits subletting. Please upload your documents
+              below to complete verification.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onChange("NO")}
+            className="ml-4 shrink-0 text-xs text-green-700 underline"
+          >
+            Change
+          </button>
         </div>
       </div>
     );
@@ -120,71 +136,28 @@ export default function LeaseQuestion() {
         This helps us verify your listing meets Colorado sublease requirements.
       </p>
 
-      {error && (
-        <p className="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">
-          {error}
-        </p>
-      )}
-
       <div className="grid gap-3 sm:grid-cols-3">
-        {(
-          [
-            {
-              value: "YES" as Answer,
-              label: "Yes",
-              description: "My lease explicitly permits subletting.",
-              icon: "✅",
-              border: "border-green-400 bg-green-50",
-              text: "text-green-800",
-            },
-            {
-              value: "NO" as Answer,
-              label: "No",
-              description: "My lease prohibits or restricts subletting.",
-              icon: "🚫",
-              border: "border-red-400 bg-red-50",
-              text: "text-red-800",
-            },
-            {
-              value: "UNKNOWN" as Answer,
-              label: "I&apos;m not sure",
-              description:
-                "Upload your lease and we&apos;ll check for you.",
-              icon: "🔍",
-              border: "border-amber-400 bg-amber-50",
-              text: "text-amber-800",
-            },
-          ] as const
-        ).map((opt) => (
+        {OPTIONS.map((opt) => (
           <button
             key={opt.value}
-            disabled={saving}
-            onClick={() => save(opt.value)}
-            className={`flex flex-col items-start rounded-2xl border-2 p-4 text-left transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 ${
-              answer === opt.value
-                ? opt.border
+            type="button"
+            onClick={() => onChange(opt.value)}
+            className={`flex flex-col items-start rounded-2xl border-2 p-4 text-left transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+              value === opt.value
+                ? opt.selectedBorder
                 : "border-slate-200 bg-white hover:border-indigo-400"
             }`}
           >
             <span className="mb-2 text-2xl">{opt.icon}</span>
             <span
-              className={`text-sm font-semibold ${answer === opt.value ? opt.text : "text-slate-900"}`}
-              dangerouslySetInnerHTML={{ __html: opt.label }}
-            />
-            <span
-              className="mt-1 text-xs text-slate-500"
-              dangerouslySetInnerHTML={{ __html: opt.description }}
-            />
+              className={`text-sm font-semibold ${value === opt.value ? opt.selectedText : "text-slate-900"}`}
+            >
+              {opt.label}
+            </span>
+            <span className="mt-1 text-xs text-slate-500">{opt.description}</span>
           </button>
         ))}
       </div>
-
-      {saving && (
-        <p className="mt-3 flex items-center gap-2 text-sm text-slate-500">
-          <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
-          Saving…
-        </p>
-      )}
     </div>
   );
 }

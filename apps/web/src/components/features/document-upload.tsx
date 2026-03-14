@@ -6,10 +6,15 @@ import { useAuth } from "@clerk/nextjs";
 import Button from "@/components/ui/button";
 
 type UploadStep = "idle" | "uploading" | "submitting" | "done" | "error";
+type LeaseAnswer = "YES" | "NO" | "UNKNOWN";
 
 interface FileState {
   file: File | null;
   path: string | null;
+}
+
+interface DocumentUploadProps {
+  leaseAnswer: LeaseAnswer | null;
 }
 
 async function getSignedUploadUrl(
@@ -41,7 +46,7 @@ async function uploadToStorage(signedUrl: string, file: File): Promise<void> {
   if (!res.ok) throw new Error("Upload failed");
 }
 
-export default function DocumentUpload() {
+export default function DocumentUpload({ leaseAnswer }: DocumentUploadProps) {
   const router = useRouter();
   const { getToken } = useAuth();
   const [step, setStep] = useState<UploadStep>("idle");
@@ -85,6 +90,7 @@ export default function DocumentUpload() {
           body: JSON.stringify({
             idDocPath: idUpload.storagePath,
             leaseDocPath: residencyUpload.storagePath,
+            ...(leaseAnswer ? { listerLeaseAnswer: leaseAnswer } : {}),
           }),
         },
       );

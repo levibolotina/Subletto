@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/clerk";
 import { prisma } from "@subletto/db";
-import DocumentUpload from "@/components/features/document-upload";
-import LeaseQuestion from "@/components/features/lease-question";
+import VerifyForm from "@/components/features/verify-form";
 
 export default async function VerifyPage() {
   const clerkUser = await currentUser();
@@ -60,12 +59,7 @@ export default async function VerifyPage() {
         </div>
       )}
 
-      {/* Lease question — shown when not yet answered or can be re-answered before PENDING */}
-      {user.verification?.status !== "VERIFIED" && (
-        <LeaseQuestion />
-      )}
-
-      <DocumentUpload />
+      <VerifyForm />
     </main>
   );
 }

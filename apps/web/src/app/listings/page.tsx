@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { prisma } from "@subletto/db";
-import ListingCard from "@/components/features/listing-card";
+import { formatCurrency } from "@subletto/shared";
+import type { ListingPublicView } from "@subletto/shared";
+import ListingsFilterBar from "@/components/features/listings-filter-bar";
+import SavedSearchForm from "@/components/features/saved-search-form";
 
 export const metadata: Metadata = {
   title: "Browse Subleases",
@@ -18,11 +21,6 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
-import ListingFilters, {
-  ListingFiltersSidebar,
-} from "@/components/features/listing-filters";
-import SavedSearchForm from "@/components/features/saved-search-form";
-import type { ListingPublicView } from "@subletto/shared";
 
 interface SearchParams {
   neighborhood?: string;
@@ -80,7 +78,8 @@ export default async function ListingsPage({
       where,
       include: {
         photos: { orderBy: { order: "asc" } },
-        owner: { select: { verifiedAt: true } },
+        owner: { select: { verifiedAt: true, trustScore: true } },
+        reviews: { select: { id: true } },
       },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * pageSize,
@@ -105,6 +104,9 @@ export default async function ListingsPage({
     availableFrom: l.availableFrom.toISOString(),
     availableTo: l.availableTo.toISOString(),
     ownerVerified: !!l.owner.verifiedAt,
+    ownerTrustScore: l.owner.trustScore,
+    ownerReviewCount: l.reviews.length,
+    isFlagged: l.isFlagged,
     photos: l.photos.map((p) => ({
       storageKey: p.storageKey,
       order: p.order,
@@ -114,61 +116,29 @@ export default async function ListingsPage({
   }));
 
   const totalPages = Math.ceil(total / pageSize);
-  const hasFilters = Object.values(searchParams).some(Boolean);
+
+  // Strip undefined values before passing to client component
+  const currentParams = Object.fromEntries(
+    Object.entries(searchParams).filter(
+      (entry): entry is [string, string] => entry[1] !== undefined
+    )
+  );
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-extrabold text-slate-900">
-          Boulder Subleases
-        </h1>
-        <p className="mt-1 text-slate-500">
-          {total} verified listing{total !== 1 ? "s" : ""} available
-        </p>
-      </div>
+    <>
+      {/* Sticky filter bar — sits directly below the navbar (top-16 = 64px) */}
+      <ListingsFilterBar count={total} currentParams={currentParams} />
 
-      {/* Mobile filters row */}
-      <div className="mb-4 flex items-center gap-3 lg:hidden">
-        <ListingFilters />
-        {hasFilters && (
-          <a
-            href="/listings"
-            className="text-sm text-indigo-600 hover:text-indigo-800"
-          >
-            Clear filters
-          </a>
-        )}
-      </div>
-
-      <div className="flex gap-6">
-        {/* Desktop sidebar (rendered inside ListingFilters) */}
-        <ListingFiltersSidebar />
-
-        {/* Results */}
-        <div className="min-w-0 flex-1">
+      {/* Split layout: left = scrollable cards, right = sticky map */}
+      <div className="flex min-h-screen">
+        {/* ── Left panel: listing cards ── */}
+        <div className="w-full lg:w-1/2 px-6 py-6">
           {publicListings.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-slate-300 p-16 text-center">
-              <div className="text-4xl">🔍</div>
-              <p className="mt-3 font-semibold text-slate-700">
-                No listings match your filters
-              </p>
-              <p className="mt-1 text-sm text-slate-400">
-                Try adjusting your search criteria
-              </p>
-              {hasFilters && (
-                <a
-                  href="/listings"
-                  className="mt-4 inline-block rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-                >
-                  Clear filters
-                </a>
-              )}
-            </div>
+            <EmptyState />
           ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
               {publicListings.map((listing) => (
-                <ListingCard key={listing.id} listing={listing} />
+                <ListingPageCard key={listing.id} listing={listing} />
               ))}
             </div>
           )}
@@ -179,7 +149,7 @@ export default async function ListingsPage({
               {page > 1 && (
                 <a
                   href={`/listings?${new URLSearchParams({ ...searchParams, page: String(page - 1) })}`}
-                  className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-50"
+                  className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-50 transition"
                 >
                   ← Previous
                 </a>
@@ -190,7 +160,7 @@ export default async function ListingsPage({
               {page < totalPages && (
                 <a
                   href={`/listings?${new URLSearchParams({ ...searchParams, page: String(page + 1) })}`}
-                  className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-50"
+                  className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-50 transition"
                 >
                   Next →
                 </a>
@@ -213,7 +183,118 @@ export default async function ListingsPage({
             </div>
           </div>
         </div>
+
+        {/* ── Right panel: sticky map placeholder ── */}
+        {/* TODO: replace with Mapbox or Google Maps embed showing neighborhood pins */}
+        <div className="hidden lg:block lg:w-1/2 sticky top-32 h-[calc(100vh-8rem)] p-6">
+          <div className="h-full w-full rounded-2xl bg-gray-100 flex flex-col items-center justify-center gap-3">
+            <span className="text-5xl">🗺️</span>
+            <p className="text-base font-medium text-gray-500">
+              Map view coming soon
+            </p>
+          </div>
+        </div>
       </div>
-    </main>
+    </>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="flex flex-col items-center justify-center py-24 text-center">
+      <span className="text-6xl">🏠</span>
+      <h2 className="mt-5 text-2xl font-bold text-slate-900">
+        No listings yet
+      </h2>
+      <p className="mt-2 text-slate-500">
+        Check back soon — new subleases are added weekly.
+      </p>
+    </div>
+  );
+}
+
+function ListingPageCard({ listing }: { listing: ListingPublicView }) {
+  const primaryPhoto =
+    listing.photos.find((p) => p.isPrimary) ?? listing.photos[0];
+
+  const from = new Date(listing.availableFrom).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+  const to = new Date(listing.availableTo).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const bedroomLabel =
+    listing.bedrooms === 0 ? "Studio" : `${listing.bedrooms} bd`;
+
+  return (
+    <div className="group bg-white rounded-2xl shadow-sm overflow-hidden hover:-translate-y-1 hover:shadow-lg transition duration-200">
+      {/* Photo — 16:9 */}
+      <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
+        {primaryPhoto ? (
+          // eslint-disable-next-line @next/next-eslint/no-img-element
+          <img
+            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/listing-photos/${primaryPhoto.storageKey}`}
+            alt={listing.title}
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center text-gray-400 text-sm">
+            No photo
+          </div>
+        )}
+
+        {/* Price badge — bottom-left overlay */}
+        <div className="absolute bottom-3 left-3">
+          <span className="rounded-full bg-white px-3 py-1 text-sm font-bold text-slate-900 shadow-sm">
+            {formatCurrency(listing.rentCents)}/mo
+          </span>
+        </div>
+      </div>
+
+      {/* Card body */}
+      <div className="px-4 py-4">
+        {/* Neighborhood badge */}
+        {listing.neighborhood && (
+          <span className="inline-block rounded-full bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1">
+            {listing.neighborhood}
+          </span>
+        )}
+
+        {/* Title */}
+        <p className="mt-2 font-semibold text-slate-900 truncate">
+          {listing.title}
+        </p>
+
+        {/* Details row */}
+        <p className="mt-1 text-sm text-gray-500">
+          {bedroomLabel} · {listing.bathrooms} ba
+        </p>
+
+        {/* Dates */}
+        <p className="mt-1 text-xs text-gray-400">
+          {from} – {to}
+        </p>
+
+        {/* Bottom row */}
+        <div className="mt-4 flex items-center justify-between">
+          <a
+            href={`/listings/${listing.slug}`}
+            className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition"
+          >
+            View listing
+          </a>
+          <a
+            href={`/listings/${listing.slug}`}
+            className="rounded-full bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700 transition"
+          >
+            Request Match
+          </a>
+        </div>
+      </div>
+    </div>
   );
 }

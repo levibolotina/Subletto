@@ -32,52 +32,6 @@ export default async function HomePage() {
   return (
     <main className="font-sans">
 
-      {/* ── Navbar ──────────────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/90 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          {/* Wordmark */}
-          <Link href="/" className="font-display text-xl font-bold text-gray-900">
-            Subletto
-          </Link>
-
-          {/* Center nav links */}
-          <div className="hidden items-center gap-8 md:flex">
-            <Link href="/listings" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-              Browse
-            </Link>
-            <a href="#how-it-works" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-              How it works
-            </a>
-          </div>
-
-          {/* Right actions */}
-          <div className="flex items-center gap-3">
-            <SignedOut>
-              <Link
-                href="/sign-in"
-                className="hidden text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors sm:block"
-              >
-                Log in
-              </Link>
-              <Link
-                href="/sign-up"
-                className="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-95"
-              >
-                Get Started
-              </Link>
-            </SignedOut>
-            <SignedIn>
-              <Link
-                href="/dashboard"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                Dashboard
-              </Link>
-            </SignedIn>
-          </div>
-        </div>
-      </nav>
-
       {/* ── Hero ────────────────────────────────────────────────────────── */}
       <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
         {/* Background image */}

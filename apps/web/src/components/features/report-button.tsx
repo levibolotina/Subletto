@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { CheckCircle } from "lucide-react";
 
 type ReportCategory = "SCAM" | "WRONG_INFO" | "INAPPROPRIATE";
 
@@ -92,7 +93,7 @@ export default function ReportButton({ listingId, reportedUserId, label = "Repor
           <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
             {submitted ? (
               <div className="text-center py-4">
-                <div className="text-3xl mb-3">✅</div>
+                <div className="mb-3 flex justify-center"><CheckCircle className="h-8 w-8 text-green-500" /></div>
                 <h3 className="text-lg font-semibold text-slate-900">Report submitted</h3>
                 <p className="mt-1 text-sm text-slate-500">
                   Our team will review this report. Thank you for keeping Subletto safe.

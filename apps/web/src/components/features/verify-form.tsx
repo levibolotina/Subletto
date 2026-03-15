@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import LeaseQuestion from "@/components/features/lease-question";
 import DocumentUpload from "@/components/features/document-upload";
+import { CheckCircle } from "lucide-react";
 
 type Answer = "YES" | "NO" | "UNKNOWN";
 
@@ -35,7 +36,7 @@ function ProgressSteps({ current }: { current: 1 | 2 | 3 }) {
                     : "bg-gray-200 text-gray-400"
                 }`}
               >
-                {done ? "✓" : step.number}
+                {done ? <CheckCircle className="h-4 w-4" /> : step.number}
               </div>
               <span
                 className={`mt-1.5 text-xs font-medium whitespace-nowrap ${

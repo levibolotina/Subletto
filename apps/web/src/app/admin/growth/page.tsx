@@ -217,20 +217,20 @@ Happy to answer any questions!
             title="CU Off-Campus Housing Facebook Group"
             badge="Facebook"
             badgeColor="bg-blue-100 text-blue-700"
-            template={`Hey everyone! 👋
+            template={`Hey everyone!
 
 I know a lot of you are dealing with the summer sublease struggle — sketchy posts, no-shows, and Venmo scams. I built a solution.
 
 **Subletto** is a new sublease marketplace made only for CU Boulder students. Here's what makes it different:
 
-✅ .edu emails only (verified CU students)
-🪪 Every lister submits their ID + lease to our admin team
-🔒 $99 connection fee held in escrow — full refund if the lister ghosts you
-📄 Optional sublease agreements and escrow for rent + deposit
+- .edu emails only (verified CU students)
+- Every lister submits their ID + lease to our admin team
+- $99 connection fee held in escrow — full refund if the lister ghosts you
+- Optional sublease agreements and escrow for rent + deposit
 
 We're launching this summer and taking early access signups now → **subletto.co/waitlist**
 
-Refer friends to move up the waitlist! Drop questions in the comments 👇`}
+Refer friends to move up the waitlist! Drop questions in the comments.`}
           />
 
           {/* Greek life */}

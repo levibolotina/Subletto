@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { currentUser } from "@/lib/clerk";
 import { prisma } from "@subletto/db";
+import { FileText } from "lucide-react";
 
 function statusBadge(status: string) {
   const map: Record<string, { label: string; classes: string }> = {
@@ -58,7 +59,7 @@ export default async function DocumentsPage() {
 
       {documents.length === 0 ? (
         <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center">
-          <span className="text-4xl">📄</span>
+          <div className="flex justify-center"><FileText className="h-10 w-10 text-slate-300" /></div>
           <h2 className="mt-4 text-lg font-bold text-slate-900">No documents yet</h2>
           <p className="mt-2 text-sm text-slate-500">
             Sublease agreements are generated automatically when a match is confirmed. Landlord
@@ -79,7 +80,7 @@ export default async function DocumentsPage() {
               >
                 <div className="flex items-center gap-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-xl">
-                    {doc.type === "SUBLEASE_AGREEMENT" ? "📝" : "📬"}
+                    <FileText className="h-5 w-5 text-indigo-500" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-slate-900">

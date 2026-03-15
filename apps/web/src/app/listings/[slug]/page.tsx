@@ -5,6 +5,7 @@ import { formatCurrency } from "@subletto/shared";
 import VerificationBadge from "@/components/features/verification-badge";
 import MatchRequestButton from "@/components/features/match-request-button";
 import PhotoCarousel from "@/components/features/photo-carousel";
+import { CheckCircle, Bed, Droplets, MapPin } from "lucide-react";
 
 interface Props {
   params: { slug: string };
@@ -112,8 +113,8 @@ export default async function ListingDetailPage({ params }: Props) {
                 {listing.neighborhood}
               </span>
               {listing.owner.verifiedAt && (
-                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
-                  ✓ Verified
+                <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                  <CheckCircle className="h-3.5 w-3.5" /> Verified
                 </span>
               )}
             </div>
@@ -133,14 +134,14 @@ export default async function ListingDetailPage({ params }: Props) {
 
             {/* Details row */}
             <div className="mt-4 flex flex-wrap gap-6 text-sm text-gray-700">
-              <span>
-                🛏{" "}
+              <span className="inline-flex items-center gap-1.5">
+                <Bed className="h-4 w-4 text-gray-500" />
                 <span className="font-medium">
                   {listing.bedrooms === 0 ? "Studio" : `${listing.bedrooms} bed`}
                 </span>
               </span>
-              <span>
-                🚿{" "}
+              <span className="inline-flex items-center gap-1.5">
+                <Droplets className="h-4 w-4 text-gray-500" />
                 <span className="font-medium">{listing.bathrooms} bath</span>
               </span>
             </div>
@@ -173,8 +174,8 @@ export default async function ListingDetailPage({ params }: Props) {
 
             {/* Map placeholder */}
             <div className="flex h-48 items-center justify-center rounded-2xl bg-gray-100">
-              <span className="text-gray-500">
-                📍 {listing.neighborhood}, Boulder CO
+              <span className="inline-flex items-center gap-1.5 text-gray-500">
+                <MapPin className="h-4 w-4" /> {listing.neighborhood}, Boulder CO
               </span>
             </div>
           </div>
@@ -218,8 +219,8 @@ export default async function ListingDetailPage({ params }: Props) {
                 <p className="mt-1">
                   {maskedEmail}{" "}
                   {listing.owner.verifiedAt && (
-                    <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
-                      ✓ Verified
+                    <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
+                      <CheckCircle className="h-3 w-3" /> Verified
                     </span>
                   )}
                 </p>

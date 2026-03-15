@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Home } from "lucide-react";
 
 interface Photo {
   storageKey: string;
@@ -24,7 +25,7 @@ export default function PhotoCarousel({
   if (photos.length === 0) {
     return (
       <div className="mb-6 aspect-video w-full rounded-2xl bg-gray-100 flex items-center justify-center">
-        <span className="text-5xl">🏠</span>
+        <Home className="h-12 w-12 text-gray-300" />
       </div>
     );
   }

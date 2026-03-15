@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PrintButton } from "./print-button";
+import { CreditCard, Lock, Home } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Subletto — Campus Flyer",
@@ -65,17 +66,17 @@ export default function FlyerPage() {
           <div className="grid grid-cols-3 gap-4">
             {[
               {
-                emoji: "🎓",
+                icon: null,
                 title: ".edu Only",
                 desc: "Every user must sign up with a CU Boulder .edu email.",
               },
               {
-                emoji: "🪪",
+                icon: <CreditCard className="h-7 w-7 mx-auto text-slate-600" />,
                 title: "ID + Lease Verified",
                 desc: "Listers submit a government ID and active lease to our team.",
               },
               {
-                emoji: "🔒",
+                icon: <Lock className="h-7 w-7 mx-auto text-slate-600" />,
                 title: "Secure Payments",
                 desc: "$99 connection fee held in escrow. Full refund if declined.",
               },
@@ -84,7 +85,7 @@ export default function FlyerPage() {
                 key={item.title}
                 className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-center"
               >
-                <div className="mb-2 text-3xl">{item.emoji}</div>
+                {item.icon && <div className="mb-2 flex justify-center">{item.icon}</div>}
                 <p className="font-semibold text-slate-900">{item.title}</p>
                 <p className="mt-1 text-xs leading-relaxed text-slate-500">{item.desc}</p>
               </div>
@@ -99,15 +100,15 @@ export default function FlyerPage() {
           </h2>
           <div className="flex items-start justify-between gap-4 text-center">
             {[
-              { n: "01", emoji: "🏠", t: "Browse listings", d: "Verified subleases, no personal info until you match." },
-              { n: "02", emoji: "🤝", t: "Request a match", d: "Pay $99 — refunded if lister declines, no questions asked." },
-              { n: "03", emoji: "📦", t: "Move in", d: "Contact info unlocked. Optional escrow for first month + deposit." },
+              { n: "01", icon: <Home className="h-6 w-6 mx-auto text-indigo-600" />, t: "Browse listings", d: "Verified subleases, no personal info until you match." },
+              { n: "02", icon: null, t: "Request a match", d: "Pay $99 — refunded if lister declines, no questions asked." },
+              { n: "03", icon: null, t: "Move in", d: "Contact info unlocked. Optional escrow for first month + deposit." },
             ].map((s) => (
               <div key={s.n} className="flex-1">
                 <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">
                   {s.n}
                 </div>
-                <div className="text-2xl">{s.emoji}</div>
+                {s.icon && <div className="flex justify-center">{s.icon}</div>}
                 <p className="mt-1 text-sm font-semibold text-indigo-900">{s.t}</p>
                 <p className="mt-1 text-xs text-indigo-700">{s.d}</p>
               </div>

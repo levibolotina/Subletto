@@ -28,7 +28,7 @@ function statusBanner(status: string) {
 
 const STATUS_LABEL: Record<string, string> = {
   AWAITING_LISTER: "Awaiting your response",
-  CONFIRMED: "Match confirmed ✓",
+  CONFIRMED: "Match confirmed",
   DECLINED: "Match declined",
 };
 
@@ -194,7 +194,7 @@ export default async function MatchDetailPage({ params }: Props) {
       {match.escrowStatus === "RELEASED" && (
         <div className="mt-5 rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">
           <strong>Escrow released.</strong> Move-in confirmed — enjoy your new
-          place! 🎉
+          place!
         </div>
       )}
 

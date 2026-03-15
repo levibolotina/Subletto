@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { prisma } from "@subletto/db";
 import WaitlistForm from "@/components/features/waitlist-form";
+import { CreditCard, Lock } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Join the Waitlist | Subletto — CU Boulder Subleases",
@@ -73,31 +74,22 @@ export default async function WaitlistPage({ searchParams }: Props) {
         {/* How referrals work */}
         <div className="mt-10 rounded-2xl bg-white/10 p-6 backdrop-blur-sm">
           <h2 className="font-semibold text-white">How the waitlist works</h2>
-          <ul className="mt-3 space-y-2 text-sm text-indigo-100">
-            <li className="flex items-start gap-2">
-              <span className="mt-0.5">1️⃣</span>
-              <span>Sign up with your .edu email — you're assigned a position based on when you joined.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-0.5">2️⃣</span>
-              <span>Share your personal referral link. Every friend who joins moves you up <strong>5 spots</strong>.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-0.5">3️⃣</span>
-              <span>When we launch, the highest-ranked users get access first.</span>
-            </li>
-          </ul>
+          <ol className="mt-3 space-y-2 text-sm text-indigo-100 list-decimal list-inside">
+            <li>Sign up with your .edu email — you're assigned a position based on when you joined.</li>
+            <li>Share your personal referral link. Every friend who joins moves you up <strong>5 spots</strong>.</li>
+            <li>When we launch, the highest-ranked users get access first.</li>
+          </ol>
         </div>
 
         {/* Trust signals */}
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
           {[
-            { icon: "🎓", label: ".edu only", desc: "CU Boulder students exclusively" },
-            { icon: "🪪", label: "ID verified", desc: "Every lister is verified by our team" },
-            { icon: "🔒", label: "Secure", desc: "Payments held in escrow until move-in" },
+            { icon: null, label: ".edu only", desc: "CU Boulder students exclusively" },
+            { icon: <CreditCard className="h-6 w-6 mx-auto" />, label: "ID verified", desc: "Every lister is verified by our team" },
+            { icon: <Lock className="h-6 w-6 mx-auto" />, label: "Secure", desc: "Payments held in escrow until move-in" },
           ].map((item) => (
             <div key={item.label} className="rounded-xl bg-white/10 p-4 text-center backdrop-blur-sm">
-              <div className="text-2xl">{item.icon}</div>
+              {item.icon && <div className="flex justify-center">{item.icon}</div>}
               <p className="mt-2 text-sm font-semibold">{item.label}</p>
               <p className="mt-0.5 text-xs text-indigo-200">{item.desc}</p>
             </div>

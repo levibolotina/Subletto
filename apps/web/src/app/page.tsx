@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { prisma } from "@subletto/db";
+import { Search, Home, CheckCircle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -93,7 +94,7 @@ export default async function HomePage() {
         <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
           {/* Badge */}
           <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
-            🎓 CU Boulder Students Only
+            CU Boulder Students Only
           </div>
 
           {/* Headline */}
@@ -181,19 +182,19 @@ export default async function HomePage() {
             {[
               {
                 step: "01",
-                emoji: "🔍",
+                icon: <Search className="h-8 w-8 text-blue-600" />,
                 title: "Browse verified listings",
                 desc: "Search CU-exclusive subleases near campus. Every listing is from a verified student.",
               },
               {
                 step: "02",
-                emoji: "✅",
+                icon: <CheckCircle className="h-8 w-8 text-blue-600" />,
                 title: "Request a match",
                 desc: "Pay the $99 connection fee. Lister accepts or declines within 48 hours. Full refund if declined.",
               },
               {
                 step: "03",
-                emoji: "🤝",
+                icon: null,
                 title: "Sign & move in",
                 desc: "Contact info unlocked. Use Subletto escrow for deposit security. Move in with confidence.",
               },
@@ -205,7 +206,7 @@ export default async function HomePage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
                   {item.step}
                 </div>
-                <div className="mt-5 text-4xl">{item.emoji}</div>
+                {item.icon && <div className="mt-5">{item.icon}</div>}
                 <h3 className="mt-4 text-base font-bold text-gray-900">{item.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-gray-500">{item.desc}</p>
               </div>
@@ -225,7 +226,7 @@ export default async function HomePage() {
               href="/listings"
               className="flex flex-col items-center rounded-2xl border-2 border-gray-100 p-8 text-center transition hover:border-blue-400 hover:shadow-lg cursor-pointer"
             >
-              <span className="text-5xl">🔍</span>
+              <Search className="h-12 w-12 text-blue-600" />
               <h3 className="mt-5 text-lg font-bold text-gray-900">Find a Sublease</h3>
               <p className="mt-2 text-sm text-gray-500">
                 Browse verified listings near CU Boulder campus from real students.
@@ -235,7 +236,7 @@ export default async function HomePage() {
               href="/onboarding"
               className="flex flex-col items-center rounded-2xl border-2 border-gray-100 p-8 text-center transition hover:border-blue-400 hover:shadow-lg cursor-pointer"
             >
-              <span className="text-5xl">🏠</span>
+              <Home className="h-12 w-12 text-blue-600" />
               <h3 className="mt-5 text-lg font-bold text-gray-900">List Your Place</h3>
               <p className="mt-2 text-sm text-gray-500">
                 Sublet your apartment to verified CU Boulder students in minutes.

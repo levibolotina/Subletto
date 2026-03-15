@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
+import { CreditCard, FileText, CheckCircle, Clock, Lock } from "lucide-react";
 
 type UploadStep = "idle" | "uploading" | "submitting" | "done" | "error";
 type LeaseAnswer = "YES" | "NO" | "UNKNOWN";
@@ -21,7 +22,7 @@ interface DocumentUploadProps {
 
 interface UploadBoxProps {
   label: string;
-  emoji: string;
+  icon: React.ReactNode;
   hint: string;
   doc: FileState;
   inputRef: React.RefObject<HTMLInputElement>;
@@ -32,7 +33,7 @@ interface UploadBoxProps {
 
 function UploadBox({
   label,
-  emoji,
+  icon,
   hint,
   doc,
   inputRef,
@@ -58,7 +59,7 @@ function UploadBox({
       />
       {doc.file ? (
         <>
-          <p className="text-2xl text-green-500">✓</p>
+          <CheckCircle className="h-6 w-6 text-green-500 mx-auto" />
           <p className="mt-2 text-xs text-gray-600 truncate px-2">
             {doc.file.name}
           </p>
@@ -76,7 +77,7 @@ function UploadBox({
         </>
       ) : (
         <>
-          <p className="text-3xl">{emoji}</p>
+          <div className="flex justify-center">{icon}</div>
           <p className="mt-3 text-sm font-semibold text-gray-800">{label}</p>
           <p className="mt-1 text-xs text-gray-400">{hint}</p>
           <button
@@ -193,7 +194,7 @@ export default function DocumentUpload({
   if (step === "done") {
     return (
       <div className="rounded-2xl bg-white shadow-sm p-8 text-center">
-        <p className="text-5xl mb-4">⏳</p>
+        <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-gray-900">
           Verification submitted!
         </h2>
@@ -222,7 +223,7 @@ export default function DocumentUpload({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <UploadBox
             label="Government ID"
-            emoji="🪪"
+            icon={<CreditCard className="h-7 w-7 text-slate-500" />}
             hint="JPG, PNG or PDF · Max 10MB"
             doc={idDoc}
             inputRef={idInputRef}
@@ -232,7 +233,7 @@ export default function DocumentUpload({
           />
           <UploadBox
             label="Proof of Residency"
-            emoji="📄"
+            icon={<FileText className="h-7 w-7 text-slate-500" />}
             hint="Utility bill, bank statement, or official mail · Max 20MB"
             doc={residencyDoc}
             inputRef={residencyInputRef}
@@ -261,8 +262,8 @@ export default function DocumentUpload({
             : "Submit for Verification"}
       </button>
 
-      <p className="text-center text-xs text-gray-400">
-        🔒 Documents are encrypted and only reviewed by our team
+      <p className="flex items-center justify-center gap-1 text-center text-xs text-gray-400">
+        <Lock className="h-3 w-3" /> Documents are encrypted and only reviewed by our team
       </p>
     </form>
   );

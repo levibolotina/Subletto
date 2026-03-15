@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@subletto/db";
+import { AlertTriangle, CheckCircle } from "lucide-react";
 
 interface Props {
   searchParams: { token?: string };
@@ -18,8 +19,8 @@ export default async function ConfirmListingPage({ searchParams }: Props) {
     return (
       <main className="flex min-h-[calc(100vh-60px)] items-center justify-center px-4">
         <div className="max-w-md text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-2xl">
-            ⚠️
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+            <AlertTriangle className="h-8 w-8 text-slate-500" />
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900">
             Link expired or invalid
@@ -51,8 +52,8 @@ export default async function ConfirmListingPage({ searchParams }: Props) {
   return (
     <main className="flex min-h-[calc(100vh-60px)] items-center justify-center px-4">
       <div className="max-w-md text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-2xl">
-          ✓
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+          <CheckCircle className="h-8 w-8 text-green-600" />
         </div>
         <h1 className="text-2xl font-extrabold text-slate-900">
           Listing confirmed

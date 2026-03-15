@@ -4,6 +4,7 @@ import { formatCurrency } from "@subletto/shared";
 import type { ListingPublicView } from "@subletto/shared";
 import ListingsFilterBar from "@/components/features/listings-filter-bar";
 import SavedSearchForm from "@/components/features/saved-search-form";
+import { Home } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Browse Subleases",
@@ -193,7 +194,6 @@ export default async function ListingsPage({
         {/* TODO: replace with Mapbox or Google Maps embed showing neighborhood pins */}
         <div className="hidden lg:block lg:w-1/2 sticky top-32 h-[calc(100vh-8rem)] p-6">
           <div className="h-full w-full rounded-2xl bg-gray-100 flex flex-col items-center justify-center gap-3">
-            <span className="text-5xl">🗺️</span>
             <p className="text-base font-medium text-gray-500">
               Map view coming soon
             </p>
@@ -207,7 +207,7 @@ export default async function ListingsPage({
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
-      <span className="text-6xl">🏠</span>
+      <Home className="h-14 w-14 text-slate-300" />
       <h2 className="mt-5 text-2xl font-bold text-slate-900">
         No listings yet
       </h2>

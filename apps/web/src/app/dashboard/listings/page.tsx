@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/clerk";
 import { prisma } from "@subletto/db";
 import { formatCurrency } from "@subletto/shared";
+import { Home } from "lucide-react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   DRAFT: { label: "Draft", color: "bg-slate-100 text-slate-600" },
@@ -70,7 +71,7 @@ export default async function MyListingsPage() {
 
       {listings.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 py-20 text-center">
-          <div className="text-3xl">🏠</div>
+          <div className="flex justify-center"><Home className="h-8 w-8 text-slate-300" /></div>
           <p className="mt-3 font-medium text-slate-600">No listings yet.</p>
           {isVerified && (
             <a
@@ -100,7 +101,6 @@ export default async function MyListingsPage() {
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-sm text-slate-300">
-                      📷
                     </div>
                   )}
                 </div>

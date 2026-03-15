@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
+import { FileText } from "lucide-react";
 
 type Document = {
   id: string;
@@ -21,7 +22,7 @@ function statusLabel(status: string) {
     PENDING: { text: "Pending generation", color: "text-slate-500" },
     GENERATED: { text: "PDF ready", color: "text-blue-600" },
     SENT_FOR_SIGNATURE: { text: "Awaiting signatures", color: "text-amber-600" },
-    SIGNED: { text: "Fully signed ✓", color: "text-green-600" },
+    SIGNED: { text: "Fully signed", color: "text-green-600" },
     DECLINED_SIGNING: { text: "Signing declined", color: "text-red-600" },
   };
   return map[status] ?? { text: status, color: "text-slate-500" };
@@ -138,7 +139,7 @@ export default function MatchDocumentsPage() {
       {!hasAgreement && (
         <div className="mb-6 rounded-2xl border border-indigo-100 bg-indigo-50 p-6">
           <div className="mb-3 flex items-center gap-3">
-            <span className="text-3xl">📝</span>
+            <FileText className="h-7 w-7 text-indigo-500 shrink-0" />
             <div>
               <h2 className="text-base font-bold text-slate-900">
                 Colorado Sublease Agreement
@@ -178,9 +179,7 @@ export default function MatchDocumentsPage() {
               >
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">
-                      {doc.type === "SUBLEASE_AGREEMENT" ? "📝" : "📬"}
-                    </span>
+                    <FileText className="h-6 w-6 text-indigo-500 shrink-0" />
                     <div>
                       <p className="text-sm font-bold text-slate-900">
                         {doc.type === "SUBLEASE_AGREEMENT"

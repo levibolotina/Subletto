@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { stripe } from "@/lib/stripe";
+import { Clock } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ export default async function MatchSuccessPage({ searchParams }: Props) {
     return (
       <main className="mx-auto max-w-md px-4 py-20 text-center">
         <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-8">
-          <div className="mb-3 text-3xl">⏳</div>
+          <div className="mb-3 flex justify-center"><Clock className="h-8 w-8 text-yellow-700" /></div>
           <h1 className="text-xl font-bold text-yellow-900">Payment pending</h1>
           <p className="mt-2 text-sm text-yellow-800">
             Your payment is still processing. Check your matches dashboard in a
@@ -48,7 +49,8 @@ export default async function MatchSuccessPage({ searchParams }: Props) {
   return (
     <main className="mx-auto max-w-md px-4 py-20 text-center">
       <div className="rounded-2xl border border-green-200 bg-green-50 p-8">
-        <div className="mb-4 text-4xl">🎉</div>
+
+
         <h1 className="text-xl font-bold text-green-900">Payment successful!</h1>
         <p className="mt-2 text-sm text-green-800">
           Your $99 connection fee has been received. The lister has been

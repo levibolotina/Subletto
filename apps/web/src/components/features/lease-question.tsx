@@ -1,5 +1,7 @@
 "use client";
 
+import { CheckCircle, XCircle, Search, AlertTriangle } from "lucide-react";
+
 type Answer = "YES" | "NO" | "UNKNOWN";
 
 interface LeaseQuestionProps {
@@ -8,9 +10,9 @@ interface LeaseQuestionProps {
 }
 
 const OPTIONS = [
-  { value: "YES" as Answer, label: "Yes", icon: "✅" },
-  { value: "NO" as Answer, label: "No", icon: "🚫" },
-  { value: "UNKNOWN" as Answer, label: "Not sure", icon: "🔍" },
+  { value: "YES" as Answer, label: "Yes", icon: <CheckCircle className="h-6 w-6 mx-auto" /> },
+  { value: "NO" as Answer, label: "No", icon: <XCircle className="h-6 w-6 mx-auto" /> },
+  { value: "UNKNOWN" as Answer, label: "Not sure", icon: <Search className="h-6 w-6 mx-auto" /> },
 ];
 
 export default function LeaseQuestion({ value, onChange }: LeaseQuestionProps) {
@@ -36,7 +38,7 @@ export default function LeaseQuestion({ value, onChange }: LeaseQuestionProps) {
                 : "border-gray-200 bg-white hover:border-blue-300"
             }`}
           >
-            <span className="text-2xl">{opt.icon}</span>
+            <div className="flex justify-center">{opt.icon}</div>
             <p
               className={`mt-2 text-sm font-semibold ${
                 value === opt.value ? "text-blue-700" : "text-gray-800"
@@ -51,7 +53,7 @@ export default function LeaseQuestion({ value, onChange }: LeaseQuestionProps) {
       {value === "NO" && (
         <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">⚠️</span>
+            <AlertTriangle className="h-5 w-5 text-red-700 shrink-0" />
             <p className="text-sm font-bold text-red-900">
               Your lease may not permit subletting
             </p>
@@ -87,7 +89,7 @@ export default function LeaseQuestion({ value, onChange }: LeaseQuestionProps) {
       {value === "UNKNOWN" && (
         <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
           <div className="flex items-start gap-2">
-            <span className="text-lg">🔍</span>
+            <Search className="h-5 w-5 text-amber-700 shrink-0 mt-0.5" />
             <p className="text-sm text-amber-800">
               Upload your lease below and our admin team will check whether
               subletting is permitted. You&apos;ll hear back within 24 hours.

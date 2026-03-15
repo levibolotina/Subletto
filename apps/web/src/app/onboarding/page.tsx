@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser, useAuth } from "@clerk/nextjs";
+import { Search, Home, CheckCircle } from "lucide-react";
 
 type Role = "LISTER" | "SEEKER";
 
@@ -97,7 +98,7 @@ export default function OnboardingPage() {
                         : "border-gray-200 bg-white"
                     }`}
                   >
-                    <span className="mb-3 text-3xl">🔍</span>
+                    <Search className="mb-3 h-8 w-8 text-blue-600" />
                     <span className="text-sm font-semibold text-gray-900">
                       I need a sublease
                     </span>
@@ -111,7 +112,7 @@ export default function OnboardingPage() {
                         : "border-gray-200 bg-white"
                     }`}
                   >
-                    <span className="mb-3 text-3xl">🏠</span>
+                    <Home className="mb-3 h-8 w-8 text-blue-600" />
                     <span className="text-sm font-semibold text-gray-900">
                       I have a place to sublet
                     </span>
@@ -142,8 +143,8 @@ export default function OnboardingPage() {
                   <div className="mt-1 flex items-center gap-2">
                     <p className="font-semibold text-gray-900">{email || "—"}</p>
                     {isEdu && (
-                      <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-700">
-                        ✓ .edu
+                      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-700">
+                        <CheckCircle className="h-3 w-3" /> .edu
                       </span>
                     )}
                   </div>
@@ -158,7 +159,7 @@ export default function OnboardingPage() {
                 <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm">
                   <p className="font-semibold text-gray-900">
                     Role:{" "}
-                    {selectedRole === "LISTER" ? "🏠 Lister" : "🔍 Seeker"}
+                    {selectedRole === "LISTER" ? "Lister" : "Seeker"}
                   </p>
                   <p className="mt-1 text-gray-500">
                     {selectedRole === "LISTER"
@@ -203,7 +204,7 @@ export default function OnboardingPage() {
             {/* ── Step 3: Done ──────────────────────────────────────── */}
             {step === 3 && (
               <div className="py-4 text-center">
-                <div className="mx-auto mb-5 text-5xl">✅</div>
+                <div className="mx-auto mb-5 flex justify-center"><CheckCircle className="h-12 w-12 text-green-500" /></div>
                 <h1 className="font-display text-2xl font-bold text-gray-900">
                   You&apos;re all set!
                 </h1>

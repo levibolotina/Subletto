@@ -4,6 +4,7 @@ import { prisma } from "@subletto/db";
 import { createAdminClient } from "@/lib/supabase";
 import { VERIFICATION_DOCS_BUCKET } from "@subletto/shared";
 import AdminReviewCard from "@/components/features/admin-review-card";
+import { CheckCircle } from "lucide-react";
 
 export default async function AdminVerifyPage() {
   const clerkUser = await currentUser();
@@ -60,7 +61,7 @@ export default async function AdminVerifyPage() {
 
       {verificationsWithUrls.length === 0 ? (
         <div className="rounded-2xl border border-slate-200 bg-slate-50 py-20 text-center">
-          <div className="text-3xl">✅</div>
+          <div className="flex justify-center"><CheckCircle className="h-8 w-8 text-green-500" /></div>
           <p className="mt-3 font-medium text-slate-600">
             All caught up — no pending verifications.
           </p>

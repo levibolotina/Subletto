@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { FileText, CheckCircle } from "lucide-react";
 
 type Listing = {
   id: string;
@@ -81,8 +82,8 @@ export default function LandlordPacketPage() {
     return (
       <main className="flex min-h-[60vh] flex-col items-center justify-center px-4">
         <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">
-            📬
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+            <FileText className="h-8 w-8 text-green-600" />
           </div>
           <h1 className="text-xl font-extrabold text-slate-900">
             Landlord Packet Ready!
@@ -139,7 +140,7 @@ export default function LandlordPacketPage() {
             "Optional: email directly to your landlord",
           ].map((item) => (
             <li key={item} className="flex items-start gap-2">
-              <span className="mt-0.5 text-indigo-600">✓</span>
+              <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-indigo-600" />
               {item}
             </li>
           ))}

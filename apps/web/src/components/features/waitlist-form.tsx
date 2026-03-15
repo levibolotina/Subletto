@@ -72,8 +72,7 @@ export default function WaitlistForm({ referredBy, appUrl }: Props) {
   if (result) {
     return (
       <div className="w-full rounded-2xl border border-indigo-100 bg-white p-6 shadow-xl shadow-indigo-100 sm:p-8">
-        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-100 text-2xl">
-          🎉
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-100">
         </div>
         <h3 className="text-xl font-bold text-slate-900">
           {result.alreadyJoined ? "You're already on the list!" : "You're on the list!"}
@@ -144,8 +143,7 @@ export default function WaitlistForm({ referredBy, appUrl }: Props) {
 
   return (
     <div className="w-full rounded-2xl border border-indigo-100 bg-white p-6 shadow-xl shadow-indigo-100 sm:p-8">
-      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-100 text-2xl">
-        🔑
+      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-100">
       </div>
       <h3 className="text-xl font-bold text-slate-900">Get early access</h3>
       <p className="mt-1 text-sm text-slate-500">

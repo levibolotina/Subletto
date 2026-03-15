@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/clerk";
 import { prisma } from "@subletto/db";
 import { formatCurrency } from "@subletto/shared";
+import { CheckCircle } from "lucide-react";
 
 export default async function AdminListingsPage() {
   const clerkUser = await currentUser();
@@ -38,7 +39,7 @@ export default async function AdminListingsPage() {
 
       {listings.length === 0 ? (
         <div className="rounded-2xl border border-slate-200 bg-slate-50 py-20 text-center">
-          <div className="text-3xl">✅</div>
+          <div className="flex justify-center"><CheckCircle className="h-8 w-8 text-green-500" /></div>
           <p className="mt-3 font-medium text-slate-600">
             No listings pending review.
           </p>

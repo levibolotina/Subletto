@@ -35,7 +35,6 @@ export default function TestimonialForm() {
   if (submitted) {
     return (
       <div className="rounded-2xl border border-green-100 bg-green-50 p-8 text-center">
-        <div className="mb-3 text-4xl">🙏</div>
         <h3 className="text-lg font-bold text-green-900">Thank you!</h3>
         <p className="mt-1 text-sm text-green-700">
           Your testimonial has been submitted and will appear on the site once approved.

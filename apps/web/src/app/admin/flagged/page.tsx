@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/clerk";
 import { prisma } from "@subletto/db";
 import { formatCurrency } from "@subletto/shared";
+import { CheckCircle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -64,7 +65,7 @@ export default async function AdminFlaggedPage() {
 
       {flagged.length === 0 ? (
         <div className="rounded-2xl border border-slate-200 bg-slate-50 py-20 text-center">
-          <div className="text-3xl">✅</div>
+          <div className="flex justify-center"><CheckCircle className="h-8 w-8 text-green-500" /></div>
           <p className="mt-3 font-medium text-slate-600">No flagged listings.</p>
         </div>
       ) : (

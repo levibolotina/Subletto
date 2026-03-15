@@ -52,7 +52,7 @@ export default async function PendingReviewsPage({
 
       {pending.length === 0 ? (
         <div className="mt-10 rounded-2xl border border-dashed border-slate-300 p-12 text-center text-slate-500">
-          <p className="text-3xl mb-3">⭐</p>
+
           <p className="font-medium">No pending reviews</p>
           <p className="mt-1 text-sm">
             Reviews become available after move-in is confirmed.

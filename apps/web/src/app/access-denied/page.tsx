@@ -1,7 +1,9 @@
+import { Lock } from "lucide-react";
+
 export default function AccessDeniedPage() {
   return (
     <main className="flex min-h-[calc(100vh-60px)] flex-col items-center justify-center px-4 py-16 text-center">
-      <div className="text-5xl">🔒</div>
+      <Lock className="h-12 w-12 text-slate-400" />
       <h1 className="mt-6 text-3xl font-extrabold text-slate-900">
         Access Denied
       </h1>

@@ -11,7 +11,7 @@ export default function TestimonialPage() {
   return (
     <main className="mx-auto max-w-lg px-4 py-16">
       <div className="mb-8 text-center">
-        <div className="mb-3 text-4xl">⭐</div>
+  
         <h1 className="text-2xl font-bold text-slate-900">Share your experience</h1>
         <p className="mt-2 text-slate-500 text-sm">
           Help other CU Boulder students know what to expect. Your quote may appear
